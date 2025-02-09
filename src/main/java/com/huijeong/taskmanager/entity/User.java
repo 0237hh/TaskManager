@@ -12,20 +12,20 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Users {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long user_id;
+    private Long userId;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String user_name;
+    private String userName;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String user_email;
+    private String userEmail;
 
     @Column(nullable = false, length = 255)
-    private String user_password;
+    private String userPassword;
 
     @Column(nullable = false)
-    private LocalDateTime join_at;
+    private LocalDateTime joinAt;
 }

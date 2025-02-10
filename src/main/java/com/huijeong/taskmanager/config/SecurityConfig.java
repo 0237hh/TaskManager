@@ -16,7 +16,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable) //CSRF 비활성화
                 .authorizeHttpRequests(auth->auth
-                        .requestMatchers("/api/users/signup", "/api/users/login", "/api/tasks/**").permitAll()
+                        .requestMatchers("/api/users/signup", "/api/users/login", "/api/tasks/**", "http://localhost:5173", "http://localhost:8080").permitAll()
                         .anyRequest().authenticated()); // 그외 모든 요청은 인증 필요
                 return http.build();
     }

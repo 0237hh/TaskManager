@@ -6,6 +6,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @Table (name = "tasks")
@@ -40,4 +41,9 @@ public class Task {
 
     @CreationTimestamp
     private LocalDateTime createAt;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date completedAt;  // 완료 날짜 추가
+
+    private int orderIndex;
 }

@@ -1,4 +1,4 @@
-package com.huijeong.taskmanager.controlloer;
+package com.huijeong.taskmanager.controller;
 
 import com.huijeong.taskmanager.entity.Task;
 import com.huijeong.taskmanager.repository.TaskRepository;

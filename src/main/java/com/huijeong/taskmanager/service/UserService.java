@@ -1,6 +1,6 @@
 package com.huijeong.taskmanager.service;
 
-import com.huijeong.taskmanager.dto.UserSignupRequest;
+import com.huijeong.taskmanager.dto.UserSignupRequestDto;
 import com.huijeong.taskmanager.entity.User;
 import com.huijeong.taskmanager.repository.UserRepository;
 import com.huijeong.taskmanager.util.JwtTokenProvider;
@@ -18,7 +18,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-    public User signup(UserSignupRequest request) {
+    public User signup(UserSignupRequestDto request) {
         User user = User.builder()
                 .userName(request.getUserName())
                 .userEmail(request.getUserEmail())

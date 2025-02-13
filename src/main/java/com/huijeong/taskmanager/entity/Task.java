@@ -35,7 +35,7 @@ public class Task {
     private TaskStatus status;
 
     @Column (nullable = false)
-    private Integer priority;
+    private int priority;
 
     private LocalDate dueDate;
 
@@ -43,7 +43,7 @@ public class Task {
     private LocalDateTime createAt;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date completedAt;  // 완료 날짜 추가
+    private Date completedAt;
 
     private int orderIndex;
 }

@@ -28,4 +28,9 @@ public class User {
 
     @Column(nullable = false)
     private LocalDateTime joinAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.joinAt = LocalDateTime.now();
+    }
 }

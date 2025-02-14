@@ -5,38 +5,49 @@ import com.huijeong.taskmanager.dto.TaskResponseDto;
 import com.huijeong.taskmanager.entity.Task;
 import com.huijeong.taskmanager.entity.User;
 import com.huijeong.taskmanager.service.TaskService;
+import com.huijeong.taskmanager.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
 public class TaskController {
     private final TaskService taskService;
+    private final UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<TaskResponseDto>> getTasks(@AuthenticationPrincipal User user) {
-        return ResponseEntity.ok(taskService.getTasks(user));
+    public ResponseEntity<List<TaskResponseDto>> getTasks(@AuthenticationPrincipal UserDetails userDetails) {
+        User user = userService.getUserByEmail(userDetails.getUsername());
+        List<TaskResponseDto> tasks = taskService.getTasks(user);
+        return ResponseEntity.ok(tasks);
     }
 
-    @GetMapping("/user")
+    @GetMapping("/userId")
     public ResponseEntity<List<Task>> getUserTasks(@AuthenticationPrincipal UserDetails userDetails) {
         List<Task> tasks = taskService.getUserTasks(userDetails.getUsername());
         return ResponseEntity.ok(tasks);
     }
 
     @PostMapping
-    public ResponseEntity<TaskResponseDto> createTask(@RequestBody TaskRequestDto request,
-                                                      @AuthenticationPrincipal User user) {
+    public ResponseEntity<TaskResponseDto> createTask(@RequestBody @Valid TaskRequestDto request,
+                                                      @AuthenticationPrincipal UserDetails userDetails) {
 
-        if (user == null) {
-            throw new RuntimeException("-----------------> 🛑 인증된 유저 정보가 없습니다!"); // 예외 발생
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
         }
+
+        User user = userService.getUserByEmail(userDetails.getUsername());  // 🔥 이메일로 User 조회
         return ResponseEntity.ok(taskService.createTask(request, user));
     }
 

@@ -32,9 +32,9 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status;
+    private TaskStatus status = TaskStatus.IN_PROGRESS;
 
-    @Column (nullable = false)
+    @Column (nullable = true)
     private int priority;
 
     private LocalDate dueDate;

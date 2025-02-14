@@ -2,15 +2,18 @@ package com.huijeong.taskmanager.config;
 
 import com.huijeong.taskmanager.security.JwtAuthFilter;
 import com.huijeong.taskmanager.service.CustomUserDetailsService;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -30,7 +33,8 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (프론트엔드 테스트용)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/login").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/**", "/api/tasks/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/tasks/**").permitAll()
                         .requestMatchers("/favicon.ico").permitAll()
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
@@ -71,5 +75,10 @@ public class SecurityConfig {
         authProvider.setUserDetailsService(customUserDetailsService); // 커스텀 UserDetailsService 사용
         authProvider.setPasswordEncoder(passwordEncoder()); // 비밀번호 암호화 방식 설정
         return authProvider;
+    }
+
+    @PostConstruct
+    public void init() {
+        SecurityContextHolder.setStrategyName(SecurityContextHolder.MODE_INHERITABLETHREADLOCAL);
     }
 }

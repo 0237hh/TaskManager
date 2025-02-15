@@ -1,7 +1,8 @@
 package com.huijeong.taskmanager.service;
 
-import com.huijeong.taskmanager.dto.NotificationMessage;
-import com.huijeong.taskmanager.dto.TaskRequest;
+import com.huijeong.taskmanager.dto.NotificationMessageDto;
+import com.huijeong.taskmanager.dto.TaskRequestDto;
+import com.huijeong.taskmanager.dto.TaskResponseDto;
 import com.huijeong.taskmanager.entity.Task;
 import com.huijeong.taskmanager.entity.User;
 import com.huijeong.taskmanager.repository.TaskRepository;
@@ -16,8 +17,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,68 +29,63 @@ public class TaskService {
     private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
 
-    public Task createTask(TaskRequest request, String userEmail) {
-        User user = userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new UsernameNotFoundException("user not found"));
-
-        Task task = Task.builder()
-                .user(user)
-                .title(request.getTitle())
-                .description(request.getTitle())
-                .status(TaskStatus.TODO)
-                .priority(request.getPriority())
-                .dueDate(request.getDueDate())
-                .build();
-
-        // WebSocket으로 새 할 일 생성 알림 전송
-        Task savedTask = taskRepository.save(task);
-        messagingTemplate.convertAndSend("topic/tasks",
-                new TaskUpdateMessage(savedTask.getTaskId(), "CREATE", savedTask));
-        return savedTask;
+    // 전체 태스크 조회
+    public List<TaskResponseDto> getTasks(User user) {
+        return taskRepository.findByUser(user)
+                .stream()
+                .map(TaskResponseDto::fromEntity)
+                .toList();
     }
 
-    public List<Task> getUserTasks(String userEmail) {
-        User user = userRepository.findByUserEmail(userEmail)
-                .orElseThrow(()-> new UsernameNotFoundException("user not found"));
-        return taskRepository.findByUser(user);
+    // 지난 태스크 목록 조회
+    public List<TaskResponseDto> getTaskHistory(int year, int month, int day) {
+        LocalDate date = LocalDate.of(year, month, day);
+        List<Task> tasks = taskRepository.findByCompletedAtBetween(
+                date.atStartOfDay(), date.plusDays(1).atStartOfDay());
+
+        return tasks.stream()
+                .map(TaskResponseDto :: fromEntity)
+                .collect(Collectors.toList());
     }
 
-    public Task updateTask (Long taskId, TaskRequest request, String userEmail) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("task not found"));
+    // 새로운 태스크 생성
+    public TaskResponseDto createTask(TaskRequestDto request, User user) {
+        Task task = new Task();
+        task.setTitle(request.getTitle());
+        task.setDescription(request.getDescription());
+        task.setStatus(request.getStatus());
+        task.setUser(user);
+        task.setDueDate(request.getDueDate());
 
-        if (!task.getUser().getUserEmail().equals(userEmail)) {
-            throw new UsernameNotFoundException("user not found");
+        task = taskRepository.save(task);
+
+        TaskResponseDto response = TaskResponseDto.fromEntity(task);
+        messagingTemplate.convertAndSend("/topic/tasks", response);
+        return response;
+    }
+
+    // 태스크 수정
+    public TaskResponseDto updateTask(Long id, TaskRequestDto request, User user) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
+
+        if (!task.getUser().equals(user)) {
+            throw new RuntimeException("Unauthorized");
         }
 
         task.setTitle(request.getTitle());
         task.setDescription(request.getDescription());
         task.setStatus(request.getStatus());
-        task.setPriority(request.getPriority());
         task.setDueDate(request.getDueDate());
 
-        // WebSocket으로 할 일 수정 알림 전송
-        Task updatedTask = taskRepository.save(task);
-        messagingTemplate.convertAndSend("topic/tasks",
-                new TaskUpdateMessage(updatedTask.getTaskId(), "UPDATE", updatedTask));
+        taskRepository.save(task);
 
-        return updatedTask;
+        TaskResponseDto response = TaskResponseDto.fromEntity(task);
+        messagingTemplate.convertAndSend("/topic/tasks", response);
+        return response;
     }
 
-    public void deleteTask (Long taskId, String userEmail) {
-        Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new EntityNotFoundException("Task not found"));
-
-        if (!task.getUser().getUserEmail().equals(userEmail)) {
-            throw new AccessDeniedException("You are not allowed to delete this task");
-        }
-        taskRepository.delete(task);
-
-        // WebSocket 으로 할일 삭제 알림 전송
-        messagingTemplate.convertAndSend("/topic/tasks",
-                new TaskUpdateMessage(taskId, "DELETE", null));
-    }
-
+    // 태스크 순서 변경
     @Transactional
     public void updateTaskOrder(List<Long> taskIds, User user) {
         int priority = 1;
@@ -103,6 +101,7 @@ public class TaskService {
         }
     }
 
+    // 완료된 태스크 조회
     @Transactional
     public void completeTask(Long taskId, User user) {
         Task task = taskRepository.findById(taskId)
@@ -116,20 +115,17 @@ public class TaskService {
 
         // WebSocket을 이용해 모든 사용자에게 알림 전송
         messagingTemplate.convertAndSend("/topic/notifications",
-                new NotificationMessage("할 일이 완료되었습니다: " + task.getTitle()));
+                new NotificationMessageDto("할 일이 완료되었습니다: " + task.getTitle()));
     }
 
-    public List<Task> getTasksByDateRange(User user, Date startDate, Date endDate) {
-        return taskRepository.findByUserAndCompletedAtBetween(user, startDate, endDate);
-    }
+    // 태스크 삭제
+    public void deleteTask(Long id, User user) {
+        Task task = taskRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Task not found"));
 
-    @Transactional
-    public void updateTaskOrder (List<Long> taskIds) {
-        for (int i = 0; i < taskIds.size(); i++) {
-            Task task = taskRepository.findById(taskIds.get(i))
-                    .orElseThrow(() -> new RuntimeException("Task not found"));
-            task.setOrderIndex(i);
-            taskRepository.save(task);
+        if (!task.getUser().equals(user)) {
+            throw new RuntimeException("Unauthorized");
         }
+        taskRepository.delete(task);
     }
 }

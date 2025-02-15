@@ -32,10 +32,10 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private TaskStatus status;
+    private TaskStatus status = TaskStatus.IN_PROGRESS;
 
-    @Column (nullable = false)
-    private Integer priority;
+    @Column (nullable = true)
+    private int priority = 0;
 
     private LocalDate dueDate;
 
@@ -43,7 +43,7 @@ public class Task {
     private LocalDateTime createAt;
 
     @Temporal(TemporalType.TIMESTAMP)
-    private Date completedAt;  // 완료 날짜 추가
+    private Date completedAt;
 
     private int orderIndex;
 }

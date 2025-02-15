@@ -1,4 +1,4 @@
-package com.huijeong.taskmanager.controlloer;
+package com.huijeong.taskmanager.controller;
 
 import com.huijeong.taskmanager.entity.Task;
 import com.huijeong.taskmanager.repository.TaskRepository;
@@ -22,7 +22,7 @@ public class NotificationController {
     public ResponseEntity<?> completeTask(@PathVariable Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
-        task.setStatus(TaskStatus.COMPLETE);
+        task.setStatus(TaskStatus.DONE);
         task.setCompletedAt(new Date());
         taskRepository.save(task);
 

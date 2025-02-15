@@ -1,5 +1,5 @@
 package com.huijeong.taskmanager.util;
 
 public enum TaskStatus {
-    TODO, IN_PROGRESS, DONE, COMPLETE
+    TODO, IN_PROGRESS, DONE
 }

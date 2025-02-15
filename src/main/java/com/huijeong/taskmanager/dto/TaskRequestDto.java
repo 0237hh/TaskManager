@@ -16,6 +16,6 @@ public class TaskRequestDto {
     private String title;
     private String description;
     private TaskStatus status;
-    private Integer priority;
+    private Integer priority = 0;
     private LocalDate dueDate;
  }

@@ -22,7 +22,7 @@ public class NotificationController {
     public ResponseEntity<?> completeTask(@PathVariable Long taskId) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
-        task.setStatus(TaskStatus.COMPLETE);
+        task.setStatus(TaskStatus.DONE);
         task.setCompletedAt(new Date());
         taskRepository.save(task);
 

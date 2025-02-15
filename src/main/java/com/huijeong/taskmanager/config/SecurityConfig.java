@@ -7,7 +7,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -33,10 +32,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (프론트엔드 테스트용)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/login").permitAll()
-                        .requestMatchers("/api/auth/**", "/api/tasks/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/tasks/**").permitAll()
-                        .requestMatchers("/favicon.ico").permitAll()
-                        .anyRequest().authenticated() // 나머지는 인증 필요
+                        .requestMatchers("/api/auth/**","/favicon.ico").permitAll()
+                        .requestMatchers("/api/tasks/**").authenticated()
+                        .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
                         .loginPage("/login") // 로그인 페이지 설정

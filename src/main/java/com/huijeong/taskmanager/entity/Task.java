@@ -35,7 +35,7 @@ public class Task {
     private TaskStatus status = TaskStatus.IN_PROGRESS;
 
     @Column (nullable = true)
-    private int priority;
+    private int priority = 0;
 
     private LocalDate dueDate;
 

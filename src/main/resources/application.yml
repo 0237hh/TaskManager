@@ -1,1 +1,25 @@
-spring.application.name=TaskManager
+server:
+  port: 8080
+
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/TaskManager
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 1019
+  jpa:
+    defer-datasource-initialization: true   # 애플리케이션이 실행될 때 db를 초기화하지 않고 첫 데이터베이스 액세스 시 초기화를 수행(*.sql 실행)
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+        show_sql: true
+jwt:
+  secret: d5h76I6986Svz2SsWGNNwg8C7vNz30SL0U0wYXgktGY=
+
+logging:
+  level:
+    org:
+      springframework: INFO

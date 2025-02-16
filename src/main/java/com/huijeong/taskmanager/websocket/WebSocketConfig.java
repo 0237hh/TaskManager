@@ -35,5 +35,4 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     public TaskWebSocketHandler taskWebSocketHandler() {
         return new TaskWebSocketHandler();
     }
-
 }

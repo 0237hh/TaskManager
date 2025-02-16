@@ -1,0 +1,57 @@
+TaskManager-frontend/
+│── public/                     # 정적 파일 (favicon, index.html 등)
+│── src/
+│   ├── api/                    # API 호출 관련 함수
+│   │   ├── authApi.js          # 로그인/회원가입 API
+│   │   ├── taskApi.js          # 할 일 관련 API
+│   │   ├── websocket.js        # WebSocket 연결 설정
+│   │
+│   ├── components/             # UI 컴포넌트
+│   │   ├── Auth/               # 인증 관련 컴포넌트
+│   │   │   ├── LoginForm.jsx
+│   │   │   ├── RegisterForm.jsx
+│   │   │   ├── LogoutButton.jsx
+│   │   │
+│   │   ├── Task/               # 할 일 관련 컴포넌트
+│   │   │   ├── TaskItem.jsx
+│   │   │   ├── TaskList.jsx
+│   │   │   ├── TaskForm.jsx
+│   │   │   ├── TaskFilter.jsx
+│   │   │
+│   │   ├── common/             # 재사용 가능한 UI 컴포넌트
+│   │   │   ├── Button.jsx
+│   │   │   ├── Modal.jsx
+│   │   │   ├── Loader.jsx
+│   │   │   ├── Notification.jsx
+│   │
+│   ├── context/                # 전역 상태 관리 (React Context API)
+│   │   ├── AuthContext.jsx     # 인증 상태 관리
+│   │   ├── TaskContext.jsx     # 할 일 상태 관리
+│   │
+│   ├── hooks/                  # 커스텀 훅
+│   │   ├── useAuth.js          # 인증 관련 훅
+│   │   ├── useTasks.js         # 할 일 관련 훅
+│   │   ├── useWebSocket.js     # WebSocket 연결 훅
+│   │
+│   ├── pages/                  # 주요 페이지 컴포넌트
+│   │   ├── Home.jsx            # 홈 화면
+│   │   ├── Login.jsx           # 로그인 화면
+│   │   ├── Register.jsx        # 회원가입 화면
+│   │   ├── TaskBoard.jsx       # 할 일 관리 화면 (드래그 앤 드롭)
+│   │   ├── Profile.jsx         # 프로필 화면
+│   │
+│   ├── routes/                 # 라우팅 설정
+│   │   ├── AppRouter.jsx       # 전체 라우트 설정
+│   │   ├── PrivateRoute.jsx    # 인증 필요 페이지 보호
+│   │
+│   ├── styles/                 # 스타일 관련 파일 (MUI, CSS)
+│   │   ├── global.css          # 전역 스타일
+│   │   ├── theme.js            # MUI 테마 설정
+│   │
+│   ├── App.jsx                 # 메인 App 컴포넌트
+│   ├── main.jsx                # React DOM 렌더링
+│
+├── .env                        # 환경 변수 (API URL 등)
+├── package.json                # 프로젝트 의존성 목록
+├── vite.config.js              # Vite 설정 파일
+└── README.md                   # 프로젝트 설명

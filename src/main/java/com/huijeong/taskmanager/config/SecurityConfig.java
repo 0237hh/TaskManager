@@ -12,6 +12,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,11 +32,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (프론트엔드 테스트용)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/login").permitAll()
-                        .requestMatchers("/api/auth/**","/favicon.ico").permitAll()
-                        .requestMatchers("/api/tasks/**").authenticated()
+                        .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**").permitAll()
+                        .requestMatchers("/api/auth/register","/api/auth/login","/favicon.ico","/assets/**").permitAll()
+                        .requestMatchers("/api/tasks/**", "/api/auth/me").authenticated()
                         .anyRequest().authenticated()
                 )
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(login -> login
                         .loginPage("/login") // 로그인 페이지 설정
                         .defaultSuccessUrl("/", true) // 로그인 성공 시 이동할 페이지

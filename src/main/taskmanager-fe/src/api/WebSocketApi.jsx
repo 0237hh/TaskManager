@@ -17,7 +17,6 @@ export const connectWebSocket = (onMessageReceived) => {
             console.error("웹소켓 오류", error);
         },
     });
-
     client.activate();
 };
 

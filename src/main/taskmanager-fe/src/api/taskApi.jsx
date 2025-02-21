@@ -1,64 +1,51 @@
-import axios from "axios";
+import { instance } from "../config/axiosConfig";
 
-const API_BASE_URL = "http://localhost:8080/api/tasks";
-
-export const getTasks = async (token) => {
+export const getTasks = async () => {
     try {
-        const response = await axios.get(API_BASE_URL, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await instance.get("/tasks");
         return response.data;
     } catch (error) {
+        console.error("❌ [getTasks] 오류 발생:", error.response);
         throw error.response?.data || "할 일 목록 가져오기 실패";
     }
 };
 
-export const createTask = async (taskData, token) => {
+export const createTask = async (taskData) => {
     try {
-        const response = await axios.post(API_BASE_URL, taskData, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await instance.post("/tasks", taskData);
         return response.data;
     } catch (error) {
         throw error.response?.data || "할 일 생성 실패";
     }
 };
 
-export const updateTask = async (taskId, updatedData, token) => {
+export const updateTask = async (taskId, updatedData) => {
     try {
-        await axios.put(`${API_BASE_URL}/${taskId}`, updatedData, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        await instance.put(`/tasks/${taskId}`, updatedData);
     } catch (error) {
         throw error.response?.data || "할 일 수정 실패";
     }
 };
 
-export const deleteTask = async (taskId, token) => {
+export const deleteTask = async (taskId) => {
     try {
-        await axios.delete(`${API_BASE_URL}/${taskId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        await instance.delete(`/tasks/${taskId}`);
     } catch (error) {
         throw error.response?.data || "할 일 삭제 실패";
     }
 };
 
-export const updateTaskOrder = async (taskIds, token) => {
+export const updateTaskOrder = async (taskIds) => {
     try {
-        await axios.put(`${API_BASE_URL}/order`, taskIds, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        await instance.put("/tasks/order", taskIds);
     } catch (error) {
         throw error.response?.data || "할 일 순서 변경 실패";
     }
 };
 
-export const completeTask = async (taskId, token) => {
+export const completeTask = async (taskId) => {
     try {
-        await axios.put(`${API_BASE_URL}/${taskId}/done`, {}, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
+        await instance.put(`/tasks/${taskId}/done`, {});
     } catch (error) {
         throw error.response?.data || "할 일 완료 처리 실패";
     }

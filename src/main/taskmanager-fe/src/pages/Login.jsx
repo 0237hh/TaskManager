@@ -1,12 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAuth from "../hooks/useAuth";
-import { getCurrentUser } from "../api/authApi";
+import { login } from "../api/authApi";
 
 const Login = () => {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
     const [error, setError] = useState("");
-    const { login } = useAuth();
     const navigate = useNavigate();
 
     const handleChange = (e) => {
@@ -16,10 +14,12 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const token = await getCurrentUser(credentials);
-            login(token);
+            const response = await login(credentials.email, credentials.password);
+            const token = response.token;
+            localStorage.setItem("token", JSON.stringify(token)); // ✅ 토큰 저장
             navigate("/tasks");
         } catch (err) {
+            console.error("❌ 로그인 실패:", err);
             setError("Invalid email or password");
         }
     };

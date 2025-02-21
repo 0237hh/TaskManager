@@ -7,6 +7,7 @@ const TaskProvider = ({ children }) => {
     const [tasks, setTasks] = useState([]);
 
     useEffect(() => {
+        const token = localStorage.getItem("token");
         fetchTasks();
     }, []);
 

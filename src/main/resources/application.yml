@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  web:
+    resources:
+      static-locations: classpath:/static/
   datasource:
     url: jdbc:mysql://localhost:3306/TaskManager
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -22,4 +25,4 @@ jwt:
 logging:
   level:
     org:
-      springframework: INFO
+      springframework: info

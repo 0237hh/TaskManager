@@ -1,39 +1,52 @@
 import { useEffect, useState } from "react";
-import {DragDropContext, Droppable} from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import "../styles/TaskBoard.css"
 import useTasks from "../hooks/useTasks";
 import TaskFilter from "../components/Task/TaskFilter";
 import TaskForm from "../components/Task/TaskForm";
 import TaskList from "../components/Task/TaskList";
 
 const TaskBoard = () => {
-    const { tasks, updateExistingTask } = useTasks();
-    const [taskList, setTaskList] = useState([]);
+    const { tasks, updateExistingTask, deleteTask } = useTasks();
+    const [taskList, setTaskList] = useState(tasks);
     const [filter, setFilter] = useState("all");
 
     useEffect(() => {
-        setTaskList(tasks);
+        if (taskList.length === 0) {
+            setTaskList(tasks); // 초기 데이터 로드 시에만 설정
+        }
     }, [tasks]);
 
     const handleAddTask = (newTask) => {
-        setTaskList([...taskList, newTask]);
+        setTaskList((prev) => [...prev, newTask]); // ✅ 기존 상태 유지
     };
 
     const handleUpdateTask = (taskId, newTitle, newStatus) => {
-        setTaskList(taskList.map(task => task.id === taskId ? { ...task, title: newTitle, status: newStatus } : task));
+        const mappedStatus = newStatus === "COMPLETED" ? "DONE" : newStatus === "PENDING" ? "TODO" : newStatus;
+
+        setTaskList((prev) =>
+            prev.map(task => task.id === taskId ? { ...task, title: newTitle, status: mappedStatus } : task)
+        );
+
+        updateExistingTask(taskId, { title: newTitle, status: mappedStatus }); // ✅ API 요청 시 상태 값 변환
     };
 
     const handleDeleteTask = (taskId) => {
-        setTaskList(taskList.filter(task => task.id !== taskId));
+        setTaskList((prev) => prev.filter(task => task.id !== taskId));
+        deleteTask(taskId);
     };
 
     const filteredTasks = taskList.filter(task =>
         filter === "all"
             ? true
             : filter === "completed"
-                ? task.status === "COMPLETED"
-                : task.status === "IN_PROGRESS" || task.status === "PENDING"
+                ? task.status === "DONE"
+                : filter === "todo"
+                    ? task.status === "TODO"
+                    : task.status === "IN_PROGRESS"
     );
 
+    // ✅ Drag & Drop 처리
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 
@@ -46,21 +59,33 @@ const TaskBoard = () => {
     };
 
     return (
-        <div className="p-5">
-            <h1 className="text-xl font-bold">Task Board</h1>
-            <TaskForm onAdd={handleAddTask} />
-            <TaskFilter filter={filter} onChange={setFilter} />
+        <div className="task-board-container">
+            <div className="task-board">
+                <h1 className="task-board-title">📌 Task Board</h1>
 
-            <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="tasks">
-                    {(provided) => (
-                        <div ref={provided.innerRef} {...provided.droppableProps}>
-                            <TaskList tasks={filteredTasks} onUpdate={handleUpdateTask} onDelete={handleDeleteTask} />
-                            {provided.placeholder}
-                        </div>
-                    )}
-                </Droppable>
-            </DragDropContext>
+                <div className="task-form-container">
+                    <TaskForm onAdd={handleAddTask} />
+                </div>
+
+                <div className="task-filter-container">
+                    <TaskFilter filter={filter} onChange={setFilter} />
+                </div>
+
+                <DragDropContext onDragEnd={handleDragEnd}>
+                    <Droppable droppableId="tasks">
+                        {(provided) => (
+                            <div ref={provided.innerRef} {...provided.droppableProps} className="task-list-container">
+                                <TaskList
+                                    tasks={filteredTasks}
+                                    onUpdate={handleUpdateTask}
+                                    onDelete={handleDeleteTask}
+                                />
+                                {provided.placeholder}
+                            </div>
+                        )}
+                    </Droppable>
+                </DragDropContext>
+            </div>
         </div>
     );
 };

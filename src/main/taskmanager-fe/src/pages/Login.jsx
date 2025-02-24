@@ -11,13 +11,18 @@ const Login = () => {
         setCredentials({ ...credentials, [e.target.name]: e.target.value });
     };
 
-    const handleSubmit = async (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const response = await login(credentials.email, credentials.password);
-            const token = response.token;
-            localStorage.setItem("token", JSON.stringify(token)); // ✅ 토큰 저장
-            navigate("/tasks");
+            if (response && response.token) {
+                localStorage.setItem("token", response.token); // ✅ JSON.stringify 제거
+                alert("로그인 성공! 🎉"); // ✅ 로그인 성공 알림 추가
+                navigate("/tasks"); // ✅ 로그인 성공 후 이동
+            } else {
+                alert("로그인 실패!");
+                throw new Error("Token이 반환되지 않았습니다.");
+            }
         } catch (err) {
             console.error("❌ 로그인 실패:", err);
             setError("Invalid email or password");
@@ -25,14 +30,42 @@ const Login = () => {
     };
 
     return (
-        <div className="container">
-            <h2>Login</h2>
-            {error && <p className="error">{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-                <input type="password" name="password" placeholder="Password" onChange={handleChange} required />
-                <button type="submit">Login</button>
+        <div className="container" style={{ maxWidth: "500px", margin: "0 auto", textAlign: "center", padding: "30px", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#fff" }}>
+            <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>LOGIN</h2>
+            {error && <p className="error" style={{ color: "red" }}>{error}</p>}
+            <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "20px" }}>
+                    <li>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            value={credentials.email}
+                            onChange={handleChange}
+                            required
+                            style={{ width: "100%", padding: "12px", fontSize: "18px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        />
+                    </li>
+                    <li>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            value={credentials.password}
+                            onChange={handleChange}
+                            required
+                            style={{ width: "100%", padding: "12px", fontSize: "18px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        />
+                    </li>
+                </ul>
+                <button type="submit" style={{ padding: "14px", fontSize: "20px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "5px" }}>Login</button>
             </form>
+            <div style={{ marginTop: "20px" }}>
+                <p>계정이 없나요?</p>
+                <button onClick={() => navigate("/register")} style={{ backgroundColor: "#28a745", color: "white", padding: "12px", fontSize: "18px", borderRadius: "5px", border: "none", cursor: "pointer" }}>
+                    회원가입하러가기!
+                </button>
+            </div>
         </div>
     );
 };

@@ -1,0 +1,69 @@
+.task-board-container {
+    width: 100%;
+    height: 100vh; /* 화면 높이 전체 사용 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+.task-board {
+    width: 80%; /* 전체 너비를 사용 */
+    max-width: 1200px; /* 너무 넓어지지 않도록 */
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.task-board-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.task-form-container {
+    margin-bottom: 16px;
+}
+
+.task-filter-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.filter-button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.filter-button:hover {
+    background-color: #0056b3;
+}
+
+.task-list-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+}
+
+@media (min-width: 768px) {
+    .task-list-container {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (min-width: 1024px) {
+    .task-list-container {
+        grid-template-columns: 1fr 1fr 1fr;
+    }
+}

@@ -15,7 +15,7 @@ const Register = () => {
         e.preventDefault();
         try {
             await register(userInfo.email, userInfo.password, userInfo.username);
-            navigate("/login");  // ✅ 회원가입 후 로그인 페이지로 이동
+            navigate("/login");
         } catch (err) {
             console.error("❌ [Register] 회원가입 실패:", err);
             setError("Registration failed. Try again.");
@@ -23,18 +23,43 @@ const Register = () => {
     };
 
     return (
-        <div className="container">
-            <h2>Register</h2>
-            {error && <p className="error">{error}</p>}
-            <form onSubmit={handleSubmit}>
-                <input type="text" name="username" placeholder="Username" onChange={handleChange} required/>
-                <br></br>
-                <input type="email" name="email" placeholder="Email" onChange={handleChange} required/>
-                <br></br>
-                <input type="password" name="password" placeholder="Password" onChange={handleChange} required/>
-                <br></br>
-                <button type="submit">Register</button>
-                <br></br>
+        <div className="container" style={{ maxWidth: "500px", margin: "0 auto", textAlign: "center", padding: "30px", borderRadius: "10px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", backgroundColor: "#fff" }}>
+            <h2 style={{ fontSize: "24px", marginBottom: "20px" }}>REGISTER</h2>
+            {error && <p className="error" style={{ color: "red" }}>{error}</p>}
+            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+                <ul style={{ listStyle: "none", padding: 0, display: "flex", flexDirection: "column", gap: "20px" }}>
+                    <li>
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Username"
+                            onChange={handleChange}
+                            required
+                            style={{ width: "100%", padding: "12px", fontSize: "18px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        />
+                    </li>
+                    <li>
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Email"
+                            onChange={handleChange}
+                            required
+                            style={{ width: "100%", padding: "12px", fontSize: "18px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        />
+                    </li>
+                    <li>
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Password"
+                            onChange={handleChange}
+                            required
+                            style={{ width: "100%", padding: "12px", fontSize: "18px", borderRadius: "5px", border: "1px solid #ccc" }}
+                        />
+                    </li>
+                </ul>
+                <button type="submit" style={{ padding: "14px", fontSize: "20px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "5px" }}>Register</button>
             </form>
         </div>
     );

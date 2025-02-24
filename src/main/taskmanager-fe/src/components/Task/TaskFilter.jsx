@@ -1,23 +1,69 @@
 const TaskFilter = ({ filter, onChange }) => {
     return (
-        <div className="p-2 flex gap-2">
+        <div style={{padding: "10px", display: "flex", gap: "16px"}}>
             <button
                 onClick={() => onChange("all")}
-                className={`p-2 rounded ${filter === "all" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                style={{
+                    padding: "12px 24px",  // 버튼 크기 확대
+                    fontSize: "16px",      // 글자 크기 확대
+                    borderRadius: "6px",
+                    backgroundColor: filter === "all" ? "#e4b53a" : "#e0e0e0",
+                    color: filter === "all" ? "#fff" : "#000",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    minWidth: "100px"      // 버튼 최소 너비 설정
+                }}
             >
                 전체
             </button>
             <button
-                onClick={() => onChange("completed")}
-                className={`p-2 rounded ${filter === "completed" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                onClick={() => onChange("done")}
+                style={{
+                    padding: "12px 24px",
+                    fontSize: "16px",
+                    borderRadius: "6px",
+                    backgroundColor: filter === "done" ? "#007bff" : "#e0e0e0",
+                    color: filter === "done" ? "#fff" : "#000",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    minWidth: "100px"
+                }}
             >
                 완료됨
             </button>
             <button
-                onClick={() => onChange("pending")}
-                className={`p-2 rounded ${filter === "pending" ? "bg-blue-500 text-white" : "bg-gray-200"}`}
+                onClick={() => onChange("in_progress")}
+                style={{
+                    padding: "12px 24px",
+                    fontSize: "16px",
+                    borderRadius: "6px",
+                    backgroundColor: filter === "in_progress" ? "#67a37c" : "#e0e0e0",
+                    color: filter === "in_progress" ? "#fff" : "#000",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    minWidth: "100px"
+                }}
             >
-                미완료
+                진행 중
+            </button>
+            <button
+                onClick={() => onChange("todo")}
+                style={{
+                    padding: "12px 24px",
+                    fontSize: "16px",
+                    borderRadius: "6px",
+                    backgroundColor: filter === "todo" ? "#ff5d5f" : "#e0e0e0",
+                    color: filter === "todo" ? "#fff" : "#000",
+                    border: "none",
+                    cursor: "pointer",
+                    fontWeight: "bold",
+                    minWidth: "100px"
+                }}
+            >
+                대기 중
             </button>
         </div>
     );

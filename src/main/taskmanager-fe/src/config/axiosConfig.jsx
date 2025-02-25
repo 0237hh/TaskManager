@@ -7,7 +7,6 @@ export const instance = axios.create({
     },
 });
 
-// 🔍 요청 인터셉터 추가 (토큰 설정 확인용)
 instance.interceptors.request.use(
     (config) => {
         let token = localStorage.getItem("token");
@@ -16,7 +15,7 @@ instance.interceptors.request.use(
             if (typeof token === "string" && token.startsWith("ey")) {
                 config.headers.Authorization = `Bearer ${token}`;
             } else {
-                localStorage.removeItem("token"); // ❗ 잘못된 토큰 삭제
+                localStorage.removeItem("token");
             }
         } else { console.warn("⚠️ 토큰이 존재하지 않습니다."); }
         return config;

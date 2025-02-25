@@ -55,8 +55,7 @@
     flex-wrap: wrap;
     gap: 20px;
     padding: 16px;
-
-    align-items: center; /* 수평 중앙 정렬 */
+    align-items: center;
 }
 
 .task-item-container {
@@ -64,22 +63,22 @@
     max-width: 360px;
     padding: 17px;
 
-    display: flex; /* Flexbox 활성화 */
-    flex-direction: column; /* 요소들을 세로 정렬 */
-    justify-content: center; /* 수직 중앙 정렬 */
-    align-items: center; /* 수평 중앙 정렬 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 @media (max-width: 1024px) {
     .task-list-container {
-        grid-template-columns: repeat(2, 1fr); /* 태블릿에서는 가로 2개 */
+        grid-template-columns: repeat(2, 1fr);
         grid-template-rows: repeat(2, auto);
     }
 }
 
 @media (max-width: 768px) {
     .task-list-container {
-        grid-template-columns: repeat(1, 1fr); /* 모바일에서는 가로 1개 */
+        grid-template-columns: repeat(1, 1fr);
         grid-template-rows: auto;
     }
 }

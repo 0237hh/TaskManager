@@ -59,7 +59,7 @@ const Register = () => {
                         />
                     </li>
                 </ul>
-                <button type="submit" style={{ padding: "14px", fontSize: "20px", cursor: "pointer", backgroundColor: "#007bff", color: "white", border: "none", borderRadius: "5px" }}>Register</button>
+                <button type="submit" style={{ padding: "14px", fontSize: "20px", cursor: "pointer", backgroundColor: "#28a745", color: "white", border: "none", borderRadius: "5px" }}>Register</button>
             </form>
         </div>
     );

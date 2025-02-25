@@ -16,9 +16,9 @@ const Login = () => {
         try {
             const response = await login(credentials.email, credentials.password);
             if (response && response.token) {
-                localStorage.setItem("token", response.token); // ✅ JSON.stringify 제거
-                alert("로그인 성공! 🎉"); // ✅ 로그인 성공 알림 추가
-                navigate("/tasks"); // ✅ 로그인 성공 후 이동
+                localStorage.setItem("token", response.token);
+                alert("로그인 성공! 🎉");
+                navigate("/tasks");
             } else {
                 alert("로그인 실패!");
                 throw new Error("Token이 반환되지 않았습니다.");

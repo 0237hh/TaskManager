@@ -33,13 +33,13 @@ const AuthProvider = ({ children }) => {
     const login = (token) => {
         localStorage.setItem("token", token);
         setUser(getUserFromToken(token));
-        window.location.href = "/tasks"; // 🔄 로그인 후 이동
+        window.location.href = "/tasks";
     };
 
     const logout = () => {
         localStorage.removeItem("token");
         setUser(null);
-        window.location.href = "/login"; // 🔄 로그아웃 후 이동
+        window.location.href = "/login";
     };
 
     return (

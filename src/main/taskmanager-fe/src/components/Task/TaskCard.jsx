@@ -7,7 +7,7 @@ import SaveIcon from "@mui/icons-material/Save";
 
 export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setNewTitle, newStatus, setNewStatus, onUpdate, onDelete }) {
     return (
-        <Card sx={{ maxWidth: 345, marginBottom: 2 }}>
+        <Card sx={{ width: "100%", minWidth: 200, marginBottom: 2 }}>
             <CardHeader title={isEditing ? "수정 중" : task.title} subheader={task.status} />
             <CardContent>
                 {isEditing ? (

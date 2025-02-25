@@ -51,19 +51,27 @@
 }
 
 .task-list-container {
-    display: grid;
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-wrap: wrap;
     gap: 16px;
+    padding: 16px;
 }
 
-@media (min-width: 768px) {
+.task-item-container {
+    width: 250px;
+    max-width: 300px;
+}
+
+@media (max-width: 1024px) {
     .task-list-container {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr); /* 태블릿에서는 가로 2개 */
+        grid-template-rows: repeat(2, auto);
     }
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 768px) {
     .task-list-container {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: repeat(1, 1fr); /* 모바일에서는 가로 1개 */
+        grid-template-rows: auto;
     }
 }

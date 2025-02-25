@@ -51,19 +51,34 @@
 }
 
 .task-list-container {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 16px;
+    align-items: center;
 }
 
-@media (min-width: 768px) {
+.task-item-container {
+    width: 320px;
+    max-width: 360px;
+    padding: 17px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+@media (max-width: 1024px) {
     .task-list-container {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, auto);
     }
 }
 
-@media (min-width: 1024px) {
+@media (max-width: 768px) {
     .task-list-container {
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: repeat(1, 1fr);
+        grid-template-rows: auto;
     }
 }

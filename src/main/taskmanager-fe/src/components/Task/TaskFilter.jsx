@@ -4,15 +4,15 @@ const TaskFilter = ({ filter, onChange }) => {
             <button
                 onClick={() => onChange("all")}
                 style={{
-                    padding: "12px 24px",  // 버튼 크기 확대
-                    fontSize: "16px",      // 글자 크기 확대
+                    padding: "12px 24px",
+                    fontSize: "16px",
                     borderRadius: "6px",
                     backgroundColor: filter === "all" ? "#e4b53a" : "#e0e0e0",
                     color: filter === "all" ? "#fff" : "#000",
                     border: "none",
                     cursor: "pointer",
                     fontWeight: "bold",
-                    minWidth: "100px"      // 버튼 최소 너비 설정
+                    minWidth: "100px"
                 }}
             >
                 전체

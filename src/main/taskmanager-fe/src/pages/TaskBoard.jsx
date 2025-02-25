@@ -18,7 +18,7 @@ const TaskBoard = () => {
     }, [tasks]);
 
     const handleAddTask = (newTask) => {
-        setTaskList((prev) => [...prev, newTask]); // ✅ 기존 상태 유지
+        setTaskList((prev) => [...prev, newTask]);
     };
 
     const handleUpdateTask = (taskId, newTitle, newStatus) => {
@@ -28,7 +28,7 @@ const TaskBoard = () => {
             prev.map(task => task.id === taskId ? { ...task, title: newTitle, status: mappedStatus } : task)
         );
 
-        updateExistingTask(taskId, { title: newTitle, status: mappedStatus }); // ✅ API 요청 시 상태 값 변환
+        updateExistingTask(taskId, { title: newTitle, status: mappedStatus });
     };
 
     const handleDeleteTask = (taskId) => {
@@ -46,7 +46,6 @@ const TaskBoard = () => {
                     : task.status === "IN_PROGRESS"
     );
 
-    // ✅ Drag & Drop 처리
     const handleDragEnd = (result) => {
         if (!result.destination) return;
 

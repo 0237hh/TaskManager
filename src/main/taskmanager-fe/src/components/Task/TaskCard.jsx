@@ -7,7 +7,7 @@ import SaveIcon from "@mui/icons-material/Save";
 
 export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setNewTitle, newStatus, setNewStatus, onUpdate, onDelete }) {
     return (
-        <Card sx={{ maxWidth: 345, marginBottom: 2 }}>
+        <Card sx={{ width: "100%", minWidth: 200, marginBottom: 2 }}>
             <CardHeader title={isEditing ? "수정 중" : task.title} subheader={task.status} />
             <CardContent>
                 {isEditing ? (
@@ -27,15 +27,15 @@ export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setN
             </CardContent>
             <CardActions disableSpacing>
                 {isEditing ? (
-                    <Button onClick={onUpdate} variant="contained" color="primary" startIcon={<SaveIcon />}>
-                        저장
-                    </Button>
+                    <IconButton onClick={onUpdate} sx={{ color: '#2196f3' }} aria-label="save">
+                        <SaveIcon />
+                    </IconButton>
                 ) : (
-                    <IconButton onClick={() => setIsEditing(true)} aria-label="edit">
+                    <IconButton onClick={() => setIsEditing(true)} aria-label="edit" sx={{ color: '#9c27b0' }}>
                         <EditIcon />
                     </IconButton>
                 )}
-                <IconButton onClick={onDelete} aria-label="delete">
+                <IconButton onClick={onDelete} aria-label="delete" sx={{ color: '#e91e63' }}>
                     <DeleteIcon />
                 </IconButton>
             </CardActions>

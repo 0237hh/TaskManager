@@ -1,6 +1,6 @@
 export const getUserFromToken = (token) => {
     try {
-        const base64Url = token.split(".")[1]; // JWT payload 부분 추출
+        const base64Url = token.split(".")[1];
         const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
         const jsonPayload = decodeURIComponent(
             atob(base64)

@@ -23,15 +23,15 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = resolveToken(request);
-        log.info("JWT Token: {}", token); // 토큰 값 확인
+        log.info("JWT Token: {}", token);
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Authentication auth = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(auth);
             log.info("✅ SecurityContext에 Authentication 설정됨: " + SecurityContextHolder.getContext().getAuthentication());
-            log.info("Extracted Username: {}", auth.getName()); // 인증된 사용자 이름 확인
-            log.info("Authentication: {}", auth); // Authentication 객체 확인
-            log.info("Principal: {}", auth.getPrincipal()); // Principal 정보 확인
+            log.info("Extracted Username: {}", auth.getName());
+            log.info("Authentication: {}", auth);
+            log.info("Principal: {}", auth.getPrincipal());
         }
 
         filterChain.doFilter(request, response);

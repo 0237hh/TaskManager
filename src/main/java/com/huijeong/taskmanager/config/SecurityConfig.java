@@ -30,7 +30,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (프론트엔드 테스트용)
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**").permitAll()
                         .requestMatchers("/api/auth/register","/api/auth/login","/favicon.ico","/assets/**").permitAll()
@@ -39,12 +39,12 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .formLogin(login -> login
-                        .loginPage("/login") // 로그인 페이지 설정
-                        .defaultSuccessUrl("/", true) // 로그인 성공 시 이동할 페이지
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/", true)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout") // 로그아웃 후 로그인 페이지로 이동
+                        .logoutSuccessUrl("/login?logout")
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
@@ -72,8 +72,8 @@ public class SecurityConfig {
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(customUserDetailsService); // 커스텀 UserDetailsService 사용
-        authProvider.setPasswordEncoder(passwordEncoder()); // 비밀번호 암호화 방식 설정
+        authProvider.setUserDetailsService(customUserDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
 

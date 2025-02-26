@@ -22,7 +22,7 @@ import java.util.Map;
 public class NotificationController {
     private final SimpMessagingTemplate messagingTemplate;
     private final TaskRepository taskRepository;
-    private final ObjectMapper objectMapper; // JSON 변환을 위한 ObjectMapper
+    private final ObjectMapper objectMapper;
 
     @PostMapping("/tasks/{taskId}/complete")
     public ResponseEntity<?> completeTask(@PathVariable Long taskId) {
@@ -43,7 +43,6 @@ public class NotificationController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("알림 전송 중 오류 발생");
         }
-
         return ResponseEntity.ok("Task completed");
     }
 }

@@ -1,31 +1,29 @@
 import { useEffect, useState } from "react";
-import { connectWebSocket } from "../api/websocketApi.jsx";
+import { connectWebSocket, disconnectWebSocket } from "../api/websocketApi";
 
 const useWebSocket = () => {
-    const [socket, setSocket] = useState(null);
     const [messages, setMessages] = useState([]);
+    const [notification, setNotification] = useState(null);
 
     useEffect(() => {
-        const ws = connectWebSocket();
-
-        ws.onmessage = (event) => {
-            setMessages((prev) => [...prev, JSON.parse(event.data)]);
-        };
-
-        setSocket(ws);
-
+        connectWebSocket(
+            (notificationMessage) => {
+                setNotification({
+                    message: notificationMessage.message,
+                    type: "info",
+                });
+                setTimeout(() => setNotification(null), 3000);
+            },
+            (taskUpdate) => {
+                setMessages((prev) => [...prev, taskUpdate]);
+            }
+        );
         return () => {
-            ws.close();
+            disconnectWebSocket();
         };
     }, []);
 
-    const sendMessage = (message) => {
-        if (socket) {
-            socket.send(JSON.stringify(message));
-        }
-    };
-
-    return { messages, sendMessage };
+    return { messages, notification };
 };
 
 export default useWebSocket;

@@ -1,29 +1,45 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const Notification = ({ message, type = "info", onClose }) => {
+    const [visible, setVisible] = useState(true);
+
     useEffect(() => {
         const timer = setTimeout(() => {
-            onClose();
+            setVisible(false);
+            setTimeout(onClose, 300);
         }, 3000);
 
         return () => clearTimeout(timer);
     }, [onClose]);
 
-    const getBgColor = () => {
+    const getStyles = () => {
         switch (type) {
             case "success":
-                return "bg-green-500";
+                return { backgroundColor: "#4CAF50" };
             case "error":
-                return "bg-red-500";
+                return { backgroundColor: "#F44336" };
             case "warning":
-                return "bg-yellow-500";
+                return { backgroundColor: "#FF9800" };
             default:
-                return "bg-blue-500";
+                return { backgroundColor: "#2196F3" };
         }
     };
 
     return (
-        <div className={`fixed top-5 right-5 text-white px-4 py-2 rounded shadow-lg ${getBgColor()}`}>
+        <div
+            style={{
+                position: "fixed",
+                top: "20px",
+                right: "20px",
+                color: "#fff",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                boxShadow: "0 2px 10px rgba(0,0,0,0.2)",
+                opacity: visible ? 1 : 0,
+                transition: "opacity 0.3s ease-in-out",
+                ...getStyles(),
+            }}
+        >
             {message}
         </div>
     );

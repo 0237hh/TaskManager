@@ -1,5 +1,7 @@
 import { ThemeProvider } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { TaskProvider } from "./context/TaskContext.jsx";
 import AppRouter from "./routes/AppRouter";
@@ -12,6 +14,7 @@ const App = () => {
             <AuthProvider>
                 <TaskProvider>
                     <AppRouter />
+                    <ToastContainer position="top-right" autoClose={3000} />
                 </TaskProvider>
             </AuthProvider>
         </ThemeProvider>

@@ -32,8 +32,9 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**").permitAll()
-                        .requestMatchers("/api/auth/register","/api/auth/login","/favicon.ico","/assets/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**","/ws/**").permitAll()
+                        .requestMatchers("/api/auth/register","/api/auth/login","/favicon.ico","/assets/**","/ws/**").permitAll()
+                        .requestMatchers("/ws/**").permitAll()
                         .requestMatchers("/api/tasks/**", "/api/auth/me").authenticated()
                         .anyRequest().authenticated()
                 )

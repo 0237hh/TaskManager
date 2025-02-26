@@ -15,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.View;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final View error;
 
     // 전체 태스크 조회
     @GetMapping
@@ -84,18 +86,20 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    // 완료된 태스크 조회
     @PutMapping("/{taskId}/done")
     public ResponseEntity<TaskResponseDto> completeTask(@PathVariable Long taskId,
                                                         @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.getUserByEmail(userDetails.getUsername());
         TaskResponseDto completedTask = taskService.completeTask(taskId, user);
 
-        // WebSocket을 통해 알림 전송
         Map<String, String> notification = new HashMap<>();
         notification.put("message", "할 일이 완료되었습니다: " + completedTask.getTitle());
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
 
+        try {
+            messagingTemplate.convertAndSend("/topic/notifications", notification);
+        } catch (Exception e) {
+           log.error("WebSocket 메시지 전송 실패: " , e.getMessage());
+        }
         return ResponseEntity.ok(completedTask);
     }
 

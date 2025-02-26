@@ -1,5 +1,6 @@
 package com.huijeong.taskmanager.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.huijeong.taskmanager.entity.Task;
 import com.huijeong.taskmanager.util.TaskStatus;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskResponseDto {
     private Long id;
     private String title;

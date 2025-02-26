@@ -7,13 +7,17 @@ import com.huijeong.taskmanager.entity.User;
 import com.huijeong.taskmanager.repository.TaskRepository;
 import com.huijeong.taskmanager.util.TaskStatus;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
@@ -105,14 +109,18 @@ public class TaskService {
         if (!task.getUser().equals(user)) {
             throw new RuntimeException("Unauthorized");
         }
-
         task.setStatus(TaskStatus.DONE);
         taskRepository.save(task);
 
         TaskResponseDto response = TaskResponseDto.fromEntity(task);
+
         messagingTemplate.convertAndSend("/topic/tasks", response);
 
-        notificationService.sendNotification("할 일이 완료되었습니다: " + task.getTitle());
+        Map<String, String> notification = new HashMap<>();
+        notification.put("message", "할 일이 완료되었습니다: " + task.getTitle());
+
+        System.out.println("------------------------->>>> 알림 메시지 전송: " + notification);
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
 
         return response;
     }

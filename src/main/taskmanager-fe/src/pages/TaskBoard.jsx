@@ -12,7 +12,6 @@ const TaskBoard = () => {
     const { tasks, updateExistingTask, deleteTask } = useTasks();
     const [taskList, setTaskList] = useState(tasks);
     const [filter, setFilter] = useState("all");
-
     const { messages, notification } = useWebSocket();
 
     useEffect(() => {
@@ -59,11 +58,13 @@ const TaskBoard = () => {
     const filteredTasks = taskList.filter(task =>
         filter === "all"
             ? true
-            : filter === "completed"
+            : filter === "done"
                 ? task.status === "DONE"
                 : filter === "todo"
                     ? task.status === "TODO"
-                    : task.status === "IN_PROGRESS"
+                    : filter === "in_progress"
+                        ? task.status === "IN_PROGRESS"
+                        : false
     );
 
     const handleDragEnd = (result) => {

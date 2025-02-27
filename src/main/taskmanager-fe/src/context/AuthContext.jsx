@@ -22,7 +22,6 @@ const AuthProvider = ({ children }) => {
                 setUser(data);
             })
             .catch((error) => {
-                console.error("❌ 사용자 정보 가져오기 실패:", error);
                 if (error.status === 401) {
                     localStorage.removeItem("token");
                     setUser(null);

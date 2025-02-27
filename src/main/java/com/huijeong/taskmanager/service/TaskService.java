@@ -12,9 +12,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -76,6 +75,13 @@ public class TaskService {
         task.setStatus(request.getStatus());
         task.setDueDate(request.getDueDate());
 
+        if (request.getStatus() == TaskStatus.DONE && task.getCompletedAt() == null) {
+            task.setCompletedAt(LocalDateTime.now());
+        }
+        else if (request.getStatus() != TaskStatus.DONE) {
+            task.setCompletedAt(null);
+        }
+
         taskRepository.save(task);
         TaskResponseDto response = TaskResponseDto.fromEntity(task);
 
@@ -110,17 +116,15 @@ public class TaskService {
             throw new RuntimeException("Unauthorized");
         }
         task.setStatus(TaskStatus.DONE);
+        if (task.getCompletedAt() == null) {
+            task.setCompletedAt(LocalDateTime.now());
+        }
         taskRepository.save(task);
 
         TaskResponseDto response = TaskResponseDto.fromEntity(task);
 
         messagingTemplate.convertAndSend("/topic/tasks", response);
-
-        Map<String, String> notification = new HashMap<>();
-        notification.put("message", "할 일이 완료되었습니다: " + task.getTitle());
-
-        System.out.println("------------------------->>>> 알림 메시지 전송: " + notification);
-        messagingTemplate.convertAndSend("/topic/notifications", notification);
+        notificationService.sendNotification(user.getUserName() + "님이 할일을 완료하였습니다: " + task.getTitle());
 
         return response;
     }

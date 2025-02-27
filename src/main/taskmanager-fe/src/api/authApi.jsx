@@ -8,12 +8,9 @@ export const login = async (email, password) => {
         if (token) {
             localStorage.setItem("token", JSON.stringify(token));
             instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        } else {
-            console.error("❌ [login] 응답에 토큰 없음!");
         }
         return response.data;
     } catch (error) {
-        console.error("❌ [login] 로그인 실패:", error.response);
         throw error.response?.data || "로그인 실패";
     }
 };
@@ -23,7 +20,6 @@ export const register = async (email, password, username) => {
         const response = await instance.post("/auth/register", { email, password, username });
         console.log("회원가입 성공:", response.data);
 
-        // 🔥 회원가입 후 바로 로그인 실행
         const loginResponse = await login(email, password);
         const token = loginResponse.token;
 
@@ -33,7 +29,6 @@ export const register = async (email, password, username) => {
 
         localStorage.setItem("token", token);
         const userInfo = getUserFromToken(token);
-        console.log("로그인된 사용자 정보:", userInfo);
         return userInfo;
 
     } catch (error) {

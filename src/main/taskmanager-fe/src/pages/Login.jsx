@@ -24,7 +24,7 @@ const Login = () => {
                 throw new Error("Token이 반환되지 않았습니다.");
             }
         } catch (err) {
-            console.error("❌ 로그인 실패:", err);
+            console.error("로그인 실패:", err);
             setError("Invalid email or password");
         }
     };

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +31,7 @@ public class NotificationController {
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
         task.setStatus(TaskStatus.DONE);
-        task.setCompletedAt(new Date());
+        task.setCompletedAt(LocalDateTime.now());
         taskRepository.save(task);
 
         // JSON 형식의 알림 메시지 생성

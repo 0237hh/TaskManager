@@ -14,45 +14,24 @@ export const connectWebSocket = (onNotificationReceived, onTaskUpdate) => {
         onConnect: () => {
             client.subscribe("/topic/notifications", (message) => {
                 try {
-                    if (!message.body) {
-                        console.warn("⚠️ 수신한 메시지가 비어 있음.");
-                        return;
-                    }
+                    if (!message.body) { return; }
                     const notification = JSON.parse(message.body);
-                    if (!notification || !notification.message) {
-                        console.warn("⚠️ 잘못된 알림 데이터:", notification);
-                        return;
-                    }
+                    if (!notification || !notification.message) { return; }
                     toast.success(notification.message, { position: "top-right" });
-                } catch (error) {
-                    console.error("❌ 알림 메시지 처리 오류:", error);
-                }
+                } catch (error) {}
             });
 
             client.subscribe("/topic/tasks", (message) => {
                 try {
-                    if (!message.body) {
-                        console.warn("⚠️ 수신한 메시지가 비어 있음.");
-                        return;
-                    }
+                    if (!message.body) { return; }
                     const taskUpdate = JSON.parse(message.body);
-                    if (!taskUpdate || typeof taskUpdate !== "object" || !taskUpdate.id) {
-                        console.warn("⚠️ 잘못된 태스크 데이터:", taskUpdate);
-                        return;
-                    }
+                    if (!taskUpdate || typeof taskUpdate !== "object" || !taskUpdate.id) { return; }
                     onTaskUpdate(taskUpdate);
-
-                } catch (error) {
-                    console.error("❌ 태스크 메시지 처리 오류:", error);
-                }
+                } catch (error) { }
             });
         },
-        onStompError: (error) => {
-            console.error("❌ WebSocket 오류 발생:", error);
-        },
-        onDisconnect: () => {
-            console.log("⚠️ WebSocket 연결이 종료되었습니다.");
-        }
+        onStompError: (error) => {},
+        onDisconnect: () => {}
     });
 
     client.activate();
@@ -61,6 +40,5 @@ export const connectWebSocket = (onNotificationReceived, onTaskUpdate) => {
 export const disconnectWebSocket = () => {
     if (client) {
         client.deactivate();
-        console.log("⚠️ WebSocket 연결 해제");
     }
 };

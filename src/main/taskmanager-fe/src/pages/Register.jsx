@@ -17,7 +17,7 @@ const Register = () => {
             await register(userInfo.email, userInfo.password, userInfo.username);
             navigate("/login");
         } catch (err) {
-            console.error("❌ [Register] 회원가입 실패:", err);
+            console.error("회원가입 실패:", err);
             setError("Registration failed. Try again.");
         }
     };

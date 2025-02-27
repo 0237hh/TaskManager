@@ -17,7 +17,7 @@ instance.interceptors.request.use(
             } else {
                 localStorage.removeItem("token");
             }
-        } else { console.warn("⚠️ 토큰이 존재하지 않습니다."); }
+        } else { console.warn("토큰이 존재하지 않습니다."); }
         return config;
     },
     (error) => Promise.reject(error)

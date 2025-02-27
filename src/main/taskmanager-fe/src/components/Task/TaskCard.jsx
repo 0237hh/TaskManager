@@ -1,9 +1,9 @@
-// TaskCard.js
 import React from "react";
 import { Card, CardHeader, CardContent, CardActions, Typography, IconButton, TextField, Select, MenuItem, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
+import { format } from "date-fns";
 
 export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setNewTitle, newStatus, setNewStatus, onUpdate, onDelete }) {
     return (
@@ -20,9 +20,19 @@ export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setN
                         </Select>
                     </>
                 ) : (
-                    <Typography variant="body2" color="text.secondary">
-                        {task.description}
-                    </Typography>
+                    <>
+                        <Typography variant="body2" color="text.secondary">
+                            {task.description}
+                        </Typography>
+                        <Typography variant="caption" color="text.secondary" display="block">
+                            생성 날짜: {task.createdAt ? format(new Date(task.createdAt), "yyyy-MM-dd HH:mm") : "N/A"}
+                        </Typography>
+                        {task.completedAt && (
+                            <Typography variant="caption" color="text.secondary" display="block">
+                                완료 날짜: {task.completedAt ? format(new Date(task.completedAt), "yyyy-MM-dd HH:mm" ) : "N/A"}
+                            </Typography>
+                        )}
+                    </>
                 )}
             </CardContent>
             <CardActions disableSpacing>

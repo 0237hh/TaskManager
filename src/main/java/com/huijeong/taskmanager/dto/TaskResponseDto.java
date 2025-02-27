@@ -22,8 +22,8 @@ public class TaskResponseDto {
     private String description;
     private TaskStatus status;
     private String userEmail;
-    private LocalDateTime createAt;
-    private LocalDateTime completeAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime completedAt;
     private LocalDate dueDate;
 
     public static TaskResponseDto fromEntity(Task task) {
@@ -33,9 +33,8 @@ public class TaskResponseDto {
                 task.getDescription(),
                 task.getStatus(),
                 task.getUser().getUserEmail(),
-                task.getCreateAt(),
-                task.getCompletedAt() != null ? task.getCompletedAt().toInstant()
-                        .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime() : null,
+                task.getCreatedAt(),
+                task.getCompletedAt() != null ? task.getCompletedAt() : null,
                 task.getDueDate()
         );
     }

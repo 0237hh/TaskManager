@@ -29,6 +29,11 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime joinAt;
 
+    private String profileImage;
+
+    @Column(nullable = false, length = 20)
+    private String role;
+
     @PrePersist
     protected void onCreate() {
         this.joinAt = LocalDateTime.now();

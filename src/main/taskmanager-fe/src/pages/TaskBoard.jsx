@@ -13,7 +13,7 @@ const TaskBoard = () => {
 
     useEffect(() => {
         if (taskList.length === 0) {
-            setTaskList(tasks); // 초기 데이터 로드 시에만 설정
+            setTaskList(tasks);
         }
     }, [tasks]);
 

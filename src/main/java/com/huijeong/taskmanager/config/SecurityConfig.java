@@ -1,6 +1,8 @@
 package com.huijeong.taskmanager.config;
 
 import com.huijeong.taskmanager.security.JwtAuthFilter;
+import com.huijeong.taskmanager.security.OAuth2LoginSuccessHandler;
+import com.huijeong.taskmanager.service.CustomOAuth2UserService;
 import com.huijeong.taskmanager.service.CustomUserDetailsService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,21 +28,26 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
     private final JwtAuthFilter jwtAuthFilter;
+    private final CustomOAuth2UserService customOAuth2UserService;
+    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**").permitAll()
-                        .requestMatchers("/api/auth/register","/api/auth/login","/favicon.ico","/assets/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**", "/oauth2/callback").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/favicon.ico", "/assets/**", "/oauth2/callback" ).permitAll()
                         .requestMatchers("/api/tasks/**", "/api/auth/me").authenticated()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .formLogin(login -> login
+                .oauth2Login(oauth2 -> oauth2
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
+                        .userInfoEndpoint(userInfo -> userInfo
+                                .userService(customOAuth2UserService)
+                        )
+                        .successHandler(oAuth2LoginSuccessHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
@@ -49,11 +56,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
-                            if (request.getRequestURI().equals("/login")) {
-                                response.sendRedirect("/login");
-                            } else {
-                                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                            }
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
                         })
                 );
         return http.build();

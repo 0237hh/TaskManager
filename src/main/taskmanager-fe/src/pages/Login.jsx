@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login } from "../api/authApi";
+import GoogleLoginButton from "../components/Auth/GoogleLoginButton.jsx";
 
 const Login = () => {
     const [credentials, setCredentials] = useState({ email: "", password: "" });
@@ -17,14 +18,14 @@ const Login = () => {
             const response = await login(credentials.email, credentials.password);
             if (response && response.token) {
                 localStorage.setItem("token", response.token);
-                alert("로그인 성공! 🎉");
+                alert("로그인 성공!");
                 navigate("/tasks");
             } else {
                 alert("로그인 실패!");
                 throw new Error("Token이 반환되지 않았습니다.");
             }
         } catch (err) {
-            console.error("❌ 로그인 실패:", err);
+            console.error("로그인 실패:", err);
             setError("Invalid email or password");
         }
     };
@@ -65,6 +66,10 @@ const Login = () => {
                 <button onClick={() => navigate("/register")} style={{ backgroundColor: "#28a745", color: "white", padding: "12px", fontSize: "18px", borderRadius: "5px", border: "none", cursor: "pointer" }}>
                     회원가입하러가기!
                 </button>
+            </div>
+            <div style={{ marginTop: "20px" }}>
+                <p>또는</p>
+                <GoogleLoginButton />
             </div>
         </div>
     );

@@ -5,17 +5,36 @@ import useTasks from "../hooks/useTasks";
 import TaskFilter from "../components/Task/TaskFilter";
 import TaskForm from "../components/Task/TaskForm";
 import TaskList from "../components/Task/TaskList";
+import useWebSocket from "../hooks/useWebSocket.jsx";
+import Notification from "../components/common/Notification.jsx";
 
 const TaskBoard = () => {
     const { tasks, updateExistingTask, deleteTask } = useTasks();
     const [taskList, setTaskList] = useState(tasks);
     const [filter, setFilter] = useState("all");
+    const { messages, notification } = useWebSocket();
 
     useEffect(() => {
         if (taskList.length === 0) {
             setTaskList(tasks);
         }
     }, [tasks]);
+
+    useEffect(() => {
+        if (messages.length > 0) {
+            const newMessage = messages[messages.length - 1];
+
+            if (newMessage.action === "updateTask") {
+                setTaskList((prev) =>
+                    prev.map(task =>
+                        task.id === newMessage.taskId
+                            ? { ...task, status: newMessage.status }
+                            : task
+                    )
+                );
+            }
+        }
+    }, [messages]);
 
     const handleAddTask = (newTask) => {
         setTaskList((prev) => [...prev, newTask]);
@@ -39,11 +58,13 @@ const TaskBoard = () => {
     const filteredTasks = taskList.filter(task =>
         filter === "all"
             ? true
-            : filter === "completed"
+            : filter === "done"
                 ? task.status === "DONE"
                 : filter === "todo"
                     ? task.status === "TODO"
-                    : task.status === "IN_PROGRESS"
+                    : filter === "in_progress"
+                        ? task.status === "IN_PROGRESS"
+                        : false
     );
 
     const handleDragEnd = (result) => {
@@ -61,6 +82,14 @@ const TaskBoard = () => {
         <div className="task-board-container">
             <div className="task-board">
                 <h1 className="task-board-title">📌 Task Board</h1>
+
+                {notification && (
+                    <Notification
+                        message={notification.message}
+                        type={notification.type}
+                        onClose={() => setNotification(null)}
+                    />
+                )}
 
                 <div className="task-form-container">
                     <TaskForm onAdd={handleAddTask} />

@@ -11,10 +11,13 @@ instance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem("token");
         if (token) {
-            config.headers.Authorization = `Bearer ${token}`;
-        } else {
-            console.warn("⚠️ 토큰이 존재하지 않습니다.");
-        }
+            try { token = JSON.parse(token); } catch (e) {}
+            if (typeof token === "string" && token.startsWith("ey")) {
+                config.headers.Authorization = `Bearer ${token}`;
+            } else {
+                localStorage.removeItem("token");
+            }
+        } else { console.warn("토큰이 존재하지 않습니다."); }
         return config;
     },
     (error) => Promise.reject(error)

@@ -1,33 +1,28 @@
 package com.huijeong.taskmanager.service;
 
-import com.huijeong.taskmanager.dto.NotificationMessageDto;
 import com.huijeong.taskmanager.dto.TaskRequestDto;
 import com.huijeong.taskmanager.dto.TaskResponseDto;
 import com.huijeong.taskmanager.entity.Task;
 import com.huijeong.taskmanager.entity.User;
 import com.huijeong.taskmanager.repository.TaskRepository;
-import com.huijeong.taskmanager.repository.UserRepository;
 import com.huijeong.taskmanager.util.TaskStatus;
-import com.huijeong.taskmanager.websocket.TaskUpdateMessage;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final UserRepository userRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final NotificationService notificationService;
 
     // 전체 태스크 조회
     public List<TaskResponseDto> getTasks(User user) {
@@ -58,9 +53,11 @@ public class TaskService {
         task.setDueDate(request.getDueDate());
 
         task = taskRepository.save(task);
-
         TaskResponseDto response = TaskResponseDto.fromEntity(task);
+
         messagingTemplate.convertAndSend("/topic/tasks", response);
+        notificationService.sendNotification(user.getUserName() + "님이 새로운 할 일을 추가했습니다: " + task.getTitle());
+
         return response;
     }
 
@@ -78,9 +75,16 @@ public class TaskService {
         task.setStatus(request.getStatus());
         task.setDueDate(request.getDueDate());
 
-        taskRepository.save(task);
+        if (request.getStatus() == TaskStatus.DONE && task.getCompletedAt() == null) {
+            task.setCompletedAt(LocalDateTime.now());
+        }
+        else if (request.getStatus() != TaskStatus.DONE) {
+            task.setCompletedAt(null);
+        }
 
+        taskRepository.save(task);
         TaskResponseDto response = TaskResponseDto.fromEntity(task);
+
         messagingTemplate.convertAndSend("/topic/tasks", response);
         return response;
     }
@@ -99,11 +103,12 @@ public class TaskService {
 
             task.setPriority(priority++);
         }
+        messagingTemplate.convertAndSend("/topic/tasks/order", taskIds);
     }
 
     // 완료된 태스크 조회
     @Transactional
-    public void completeTask(Long taskId, User user) {
+    public TaskResponseDto completeTask(Long taskId, User user) {
         Task task = taskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Task not found"));
 
@@ -111,11 +116,17 @@ public class TaskService {
             throw new RuntimeException("Unauthorized");
         }
         task.setStatus(TaskStatus.DONE);
+        if (task.getCompletedAt() == null) {
+            task.setCompletedAt(LocalDateTime.now());
+        }
         taskRepository.save(task);
 
-        // WebSocket을 이용해 모든 사용자에게 알림 전송
-        messagingTemplate.convertAndSend("/topic/notifications",
-                new NotificationMessageDto("할 일이 완료되었습니다: " + task.getTitle()));
+        TaskResponseDto response = TaskResponseDto.fromEntity(task);
+
+        messagingTemplate.convertAndSend("/topic/tasks", response);
+        notificationService.sendNotification(user.getUserName() + "님이 할일을 완료하였습니다: " + task.getTitle());
+
+        return response;
     }
 
     // 태스크 삭제
@@ -127,5 +138,6 @@ public class TaskService {
             throw new RuntimeException("Unauthorized");
         }
         taskRepository.delete(task);
+        messagingTemplate.convertAndSend("/topic/tasks/delete", id);
     }
 }

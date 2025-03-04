@@ -15,7 +15,7 @@ const TaskFilter = ({ filter, onChange }) => {
                     minWidth: "100px"
                 }}
             >
-                전체
+                All
             </button>
             <button
                 onClick={() => onChange("done")}
@@ -31,7 +31,7 @@ const TaskFilter = ({ filter, onChange }) => {
                     minWidth: "100px"
                 }}
             >
-                완료됨
+                Completed
             </button>
             <button
                 onClick={() => onChange("in_progress")}
@@ -47,7 +47,7 @@ const TaskFilter = ({ filter, onChange }) => {
                     minWidth: "100px"
                 }}
             >
-                진행 중
+                In Progress
             </button>
             <button
                 onClick={() => onChange("todo")}
@@ -63,7 +63,7 @@ const TaskFilter = ({ filter, onChange }) => {
                     minWidth: "100px"
                 }}
             >
-                대기 중
+                Pending
             </button>
         </div>
     );

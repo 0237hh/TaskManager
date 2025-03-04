@@ -10,12 +10,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.View;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -24,6 +28,8 @@ import java.util.List;
 public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final View error;
 
     // 전체 태스크 조회
     @GetMapping
@@ -47,13 +53,18 @@ public class TaskController {
     @PostMapping
     public ResponseEntity<TaskResponseDto> createTask(@RequestBody @Valid TaskRequestDto request,
                                                       @AuthenticationPrincipal UserDetails userDetails) {
-
         if (userDetails == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not authenticated");
         }
 
         User user = userService.getUserByEmail(userDetails.getUsername());
-        return ResponseEntity.ok(taskService.createTask(request, user));
+        TaskResponseDto createdTask = taskService.createTask(request, user);
+
+        Map<String, String> notification = new HashMap<>();
+        notification.put("message", "새로운 할 일이 추가되었습니다: " + createdTask.getTitle());
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+
+        return ResponseEntity.ok(createdTask);
     }
 
     // 태스크 수정
@@ -75,13 +86,21 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    // 완료된 태스크 조회
     @PutMapping("/{taskId}/done")
-    public ResponseEntity<Void> completeTask(@PathVariable Long taskId,
-                                             @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<TaskResponseDto> completeTask(@PathVariable Long taskId,
+                                                        @AuthenticationPrincipal UserDetails userDetails) {
         User user = userService.getUserByEmail(userDetails.getUsername());
-        taskService.completeTask(taskId, user);
-        return ResponseEntity.ok().build();
+        TaskResponseDto completedTask = taskService.completeTask(taskId, user);
+
+        Map<String, String> notification = new HashMap<>();
+        notification.put("message", "할 일이 완료되었습니다: " + completedTask.getTitle());
+
+        try {
+            messagingTemplate.convertAndSend("/topic/notifications", notification);
+        } catch (Exception e) {
+           log.error("WebSocket 메시지 전송 실패: " , e.getMessage());
+        }
+        return ResponseEntity.ok(completedTask);
     }
 
     // 태스크 삭제

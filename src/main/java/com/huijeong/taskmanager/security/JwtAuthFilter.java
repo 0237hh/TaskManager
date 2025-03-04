@@ -39,6 +39,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        return path.startsWith("/oauth2/callback") || path.startsWith("/assets/") || path.equals("/") || path.startsWith("/favicon.ico");
+        if (path.startsWith("/oauth2/callback")) { return true; }
+        return false;
     }
 }

@@ -32,7 +32,6 @@ export const register = async (email, password, username) => {
 
         localStorage.setItem("token", token);
         const userInfo = getUserFromToken(token);
-        console.log("로그인된 사용자 정보:", userInfo);
         return userInfo;
 
     } catch (error) {

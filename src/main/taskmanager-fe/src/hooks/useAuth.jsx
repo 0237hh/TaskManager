@@ -12,12 +12,8 @@ const useAuth = () => {
             try {
                 const parsedToken = JSON.parse(token);
                 instance.defaults.headers.common["Authorization"] = `Bearer ${parsedToken}`;
-            } catch (error) {
-                console.error("❌ [useAuth] 토큰 파싱 오류:", error);
-            }
-        } else {
-            console.warn("⚠️ [useAuth] 토큰이 없습니다.");
-        }
+            } catch (error) { }
+        } else { }
     }, []);
     return { user, setUser };
 };

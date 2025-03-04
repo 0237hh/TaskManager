@@ -9,7 +9,7 @@ export const instance = axios.create({
 
 instance.interceptors.request.use(
     (config) => {
-        let token = localStorage.getItem("token");
+        const token = localStorage.getItem("token");
         if (token) {
             try { token = JSON.parse(token); } catch (e) {}
             if (typeof token === "string" && token.startsWith("ey")) {
@@ -22,3 +22,4 @@ instance.interceptors.request.use(
     },
     (error) => Promise.reject(error)
 );
+

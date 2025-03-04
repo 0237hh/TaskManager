@@ -5,6 +5,7 @@ import com.huijeong.taskmanager.dto.UserLoginRequestDto;
 import com.huijeong.taskmanager.dto.UserSignupRequestDto;
 import com.huijeong.taskmanager.entity.User;
 import com.huijeong.taskmanager.repository.UserRepository;
+import com.huijeong.taskmanager.service.GoogleOAuthService;
 import com.huijeong.taskmanager.util.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,7 @@ public class AuthController {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final GoogleOAuthService googleOAuthService;
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserSignupRequestDto request) {
@@ -85,8 +87,16 @@ public class AuthController {
             log.error("인증되지 않은 요청입니다.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        User user = userRepository.findByUserEmail(userDetails.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-        UserDto userDto = new UserDto(userDetails.getUsername(), userDetails.getUsername());
+        UserDto userDto = new UserDto(user.getUserEmail(), user.getUserName());
         return ResponseEntity.ok(userDto);
+    }
+
+    @PostMapping("/google-login")
+    public ResponseEntity<?> googleLogin(@RequestParam("code") String code) {
+        String jwtToken = googleOAuthService.loginWithGoogle(code);
+        return ResponseEntity.ok().body(Map.of("token", jwtToken));
     }
 }

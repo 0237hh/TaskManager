@@ -8,9 +8,12 @@ export const login = async (email, password) => {
         if (token) {
             localStorage.setItem("token", JSON.stringify(token));
             instance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        } else {
+            console.error("응답에 토큰 없음");
         }
         return response.data;
     } catch (error) {
+        console.error("로그인 실패:", error.response);
         throw error.response?.data || "로그인 실패";
     }
 };
@@ -43,7 +46,7 @@ export const getCurrentUser = async () => {
         return response.data;
     } catch (error) {
         if (error.response?.status === 401) {
-            console.warn("⚠️ 401 오류 발생: 인증 만료됨");
+            console.warn("오류 발생: 인증 만료됨");
             localStorage.removeItem("token");
             window.location.href = "/login";
         }

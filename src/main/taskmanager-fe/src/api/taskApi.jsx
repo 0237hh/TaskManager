@@ -5,6 +5,7 @@ export const getTasks = async () => {
         const response = await instance.get("/tasks");
         return response.data;
     } catch (error) {
+        console.error("오류 발생:", error.response);
         throw error.response?.data || "할 일 목록 가져오기 실패";
     }
 };

@@ -35,4 +35,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         String bearerToken = request.getHeader("Authorization");
         return (bearerToken != null && bearerToken.startsWith("Bearer ")) ? bearerToken.substring(7) : null;
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getRequestURI();
+        if (path.startsWith("/oauth2/callback")) { return true; }
+        return false;
+    }
 }

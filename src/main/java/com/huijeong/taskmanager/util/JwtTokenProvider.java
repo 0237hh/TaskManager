@@ -27,17 +27,27 @@ public class JwtTokenProvider {
     private String secretKeyString;
 
     private SecretKey secretKey;
-    private final long validityInMilliseconds = 3600000; // 1시간
+
+    private final long accessTokenValidity = 3600000;
+    private final long refreshTokenValidity = 7 * 24 * 60 * 60 * 1000L;
 
     @PostConstruct
     public void init() {
         this.secretKey = Keys.hmacShaKeyFor(secretKeyString.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String createToken(String userEmail) {
+    public String createAccessToken(String userEmail) {
+        return createToken(userEmail, accessTokenValidity);
+    }
+
+    public String createRefreshToken(String userEmail) {
+        return createToken(userEmail, refreshTokenValidity);
+    }
+
+    private String createToken(String userEmail, long validityInMillis) {
         Claims claims = Jwts.claims().setSubject(userEmail);
         Date now = new Date();
-        Date validity = new Date(now.getTime() + validityInMilliseconds);
+        Date validity = new Date(now.getTime() + validityInMillis);
 
         return Jwts.builder()
                 .setClaims(claims)

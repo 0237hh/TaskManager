@@ -36,9 +36,11 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**", "/oauth2/**", "/favicon.ico", "/assets/**", "/error","/ws/**").permitAll()
-                        .requestMatchers("/api/auth/**","/ws/**").permitAll()
+                        .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**",
+                                "/oauth2/**", "/favicon.ico", "/assets/**", "/error","/ws/**", "/refresh").permitAll()
+                        .requestMatchers("/api/auth/register","/api/auth/login","ws/**").permitAll()
                         .requestMatchers("/api/tasks/**", "/api/auth/me").authenticated()
+                        .requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

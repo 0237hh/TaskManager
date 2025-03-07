@@ -29,7 +29,6 @@ public class TaskController {
     private final TaskService taskService;
     private final UserService userService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final View error;
 
     // 전체 태스크 조회
     @GetMapping

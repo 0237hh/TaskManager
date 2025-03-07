@@ -16,8 +16,12 @@ const Login = () => {
         e.preventDefault();
         try {
             const response = await login(credentials.email, credentials.password);
-            if (response && response.token) {
-                localStorage.setItem("token", response.token);
+
+            const { accessToken, refreshToken } = response;
+
+            if (accessToken && refreshToken) {
+                localStorage.setItem("accessToken", accessToken);
+                localStorage.setItem("refreshToken", refreshToken);
                 alert("로그인 성공!");
                 navigate("/tasks");
             } else {

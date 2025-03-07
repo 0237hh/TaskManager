@@ -31,7 +31,7 @@ public class User {
 
     private String profileImage;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     private String role;
 
     @PrePersist

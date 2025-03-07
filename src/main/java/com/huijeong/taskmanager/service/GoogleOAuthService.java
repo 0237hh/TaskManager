@@ -41,7 +41,7 @@ public class GoogleOAuthService {
                             .build();
                     return userRepository.save(newUser);
                 });
-        return jwtTokenProvider.createToken(user.getUserEmail());
+        return jwtTokenProvider.createAccessToken(user.getUserEmail());
     }
 
     private GoogleUserInfoDto getGoogleUserInfo(String accessToken) {

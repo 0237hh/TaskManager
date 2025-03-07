@@ -34,7 +34,6 @@ public class NotificationController {
         task.setCompletedAt(LocalDateTime.now());
         taskRepository.save(task);
 
-        // JSON 형식의 알림 메시지 생성
         Map<String, String> notification = new HashMap<>();
         notification.put("message", "할 일 '" + task.getTitle() + "'이(가) 완료되었습니다!");
 

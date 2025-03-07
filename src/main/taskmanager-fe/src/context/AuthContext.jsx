@@ -6,28 +6,38 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        checkAutoLogin();
+    }, []);
+
+    const checkAutoLogin = async () => {
         const token = localStorage.getItem("token");
-
-        if (!token) { return; }
-
-        const parsedUser = getUserFromToken(token);
-        if (parsedUser) {
-            setUser(parsedUser);
+        if (!token) {
+            setLoading(false);
+            return;
         }
 
-        getCurrentUser()
-            .then((data) => {
-                setUser(data);
-            })
-            .catch((error) => {
-                if (error.status === 401) {
-                    localStorage.removeItem("token");
-                    setUser(null);
-                }
-            });
-    }, []);
+        try {
+            const parsedUser = getUserFromToken(token);
+            if (parsedUser) {
+                setUser(parsedUser);
+            }
+
+            const data = await getCurrentUser();
+            setUser(data);
+        } catch (error) {
+            if (error.response?.status === 401) {
+                console.warn("세션 만료 - 로그아웃 처리");
+                logout();
+            } else {
+                console.error("유저 정보 조회 실패:", error);
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const login = (token) => {
         localStorage.setItem("token", token);
@@ -40,6 +50,10 @@ const AuthProvider = ({ children }) => {
         setUser(null);
         window.location.href = "/login";
     };
+
+    if (loading) {
+        return <div>Loading...</div>;
+    }
 
     return (
         <AuthContext.Provider value={{ user, login, logout }}>

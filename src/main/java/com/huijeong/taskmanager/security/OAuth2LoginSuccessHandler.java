@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-
 import java.io.IOException;
 
 @Slf4j
@@ -26,7 +25,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                                         Authentication authentication) throws IOException {
 
         String email = extractEmailFromAuthentication(authentication);
-        String token = jwtTokenProvider.createToken(email);
+        String token = jwtTokenProvider.createAccessToken(email);
 
         String redirectUrl = "http://localhost:8080/oauth2/callback?token=" + token;
         response.sendRedirect(redirectUrl);

@@ -7,6 +7,8 @@ import TaskForm from "../components/Task/TaskForm";
 import TaskList from "../components/Task/TaskList";
 import useWebSocket from "../hooks/useWebSocket.jsx";
 import Notification from "../components/common/Notification.jsx";
+import LogoutButton from "../components/Auth/LogoutButton.jsx";
+import Profile from "./Profile.jsx";
 
 const TaskBoard = () => {
     const { tasks, updateExistingTask, deleteTask } = useTasks();
@@ -81,6 +83,10 @@ const TaskBoard = () => {
     return (
         <div className="task-board-container">
             <div className="task-board">
+                <div className="absolute left-4 top-4">
+                    <LogoutButton onLogout={() => navigate("/login")}/>
+                </div>
+                <Profile />
                 <h1 className="task-board-title">📌 Task Board</h1>
 
                 {notification && (
@@ -92,11 +98,11 @@ const TaskBoard = () => {
                 )}
 
                 <div className="task-form-container">
-                    <TaskForm onAdd={handleAddTask} />
+                    <TaskForm onAdd={handleAddTask}/>
                 </div>
 
                 <div className="task-filter-container">
-                    <TaskFilter filter={filter} onChange={setFilter} />
+                    <TaskFilter filter={filter} onChange={setFilter}/>
                 </div>
 
                 <DragDropContext onDragEnd={handleDragEnd}>

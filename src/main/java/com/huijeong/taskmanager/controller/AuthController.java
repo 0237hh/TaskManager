@@ -87,7 +87,6 @@ public class AuthController {
         return ResponseEntity.ok(tokenResponse);
     }
 
-
     @GetMapping("/me")
     public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {

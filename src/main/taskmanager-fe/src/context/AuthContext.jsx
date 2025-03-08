@@ -20,13 +20,13 @@ const AuthProvider = ({ children }) => {
             const refreshToken = localStorage.getItem("refreshToken");
 
             if (!accessToken && refreshToken) {
-                console.warn("🚨 액세스 토큰 없음 → 리프레시 토큰으로 갱신 시도");
+                console.warn("액세스 토큰 없음 → 리프레시 토큰으로 갱신 시도");
                 const newToken = await refreshAccessToken();
                 if (newToken) {
                     localStorage.setItem("accessToken", newToken);
                     setUser(getUserFromToken(newToken));
                 } else {
-                    console.warn("❌ 새 토큰 발급 실패 → 로그아웃");
+                    console.warn("새 토큰 발급 실패 → 로그아웃");
                     logout();
                     return;
                 }
@@ -40,10 +40,10 @@ const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             if (error.response?.status === 401) {
-                console.warn("🔄 세션 만료 → 로그아웃");
+                console.warn("세션 만료 → 로그아웃");
                 logout();
             } else {
-                console.error("❌ 유저 정보 조회 실패:", error);
+                console.error("유저 정보 조회 실패:", error);
             }
         }
 
@@ -51,14 +51,12 @@ const AuthProvider = ({ children }) => {
     };
 
     const login = (accessToken, refreshToken) => {
-        console.log("🔐 로그인 성공, 토큰 저장:", accessToken);
         localStorage.setItem("accessToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
         setUser(getUserFromToken(accessToken));
     };
 
     const logout = () => {
-        console.log("🚪 로그아웃");
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         setUser(null);

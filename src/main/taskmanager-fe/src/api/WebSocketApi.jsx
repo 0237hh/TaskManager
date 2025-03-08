@@ -18,6 +18,7 @@ export const connectWebSocket = (onNotificationReceived, onTaskUpdate) => {
                     const notification = JSON.parse(message.body);
                     if (!notification || !notification.message) { return; }
                     toast.success(notification.message, { position: "top-right" });
+                    onNotificationReceived(notification)
                 } catch (error) {}
             });
 

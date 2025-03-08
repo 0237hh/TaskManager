@@ -13,7 +13,6 @@ export const login = async (email, password) => {
             localStorage.setItem("refreshToken", JSON.stringify(refreshToken));
             instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         } else {
-            console.error("응답에 토큰 없음");
             throw new Error("서버 응답에 토큰 정보가 없습니다.");
         }
         return response.data;

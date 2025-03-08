@@ -42,28 +42,25 @@ instance.interceptors.response.use(
 
             if (refreshToken) {
                 try {
-                    console.log("🔄 리프레시 토큰으로 새로운 액세스 토큰 요청 중...");
                     const response = await axios.post(
                         "http://localhost:8080/api/auth/refresh",
-                        { refreshToken },  // ⬅️ 요청 본문에 refreshToken 전달
+                        { refreshToken },
                         { headers: { "Content-Type": "application/json" } }
                     );
 
                     const newAccessToken = response.data.accessToken;
                     if (newAccessToken) {
-                        console.log("✅ 새 accessToken 발급 완료");
                         localStorage.setItem("accessToken", JSON.stringify(newAccessToken));
                         originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
                         return axios(originalRequest);
                     }
                 } catch (refreshError) {
-                    console.error("❌ 리프레시 토큰 갱신 실패 → 로그아웃");
                     localStorage.removeItem("accessToken");
                     localStorage.removeItem("refreshToken");
                     logout();
                 }
             } else {
-                console.warn("⚠️ 리프레시 토큰이 존재하지 않습니다.");
+                console.warn("리프레시 토큰이 존재하지 않습니다.");
                 logout();
             }
         }

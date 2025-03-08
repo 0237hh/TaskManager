@@ -1,6 +1,7 @@
 import { useState } from "react";
 import useAuth from "../hooks/useAuth";
 import Modal from "../components/common/Modal.jsx";
+import Avatar from "@mui/material/Avatar";
 
 const Profile = () => {
     const { user, logout } = useAuth();
@@ -17,18 +18,17 @@ const Profile = () => {
     };
 
     return (
-        <div className="container">
-            <h2>Profile</h2>
-            <button onClick={handleProfileClick} className="bg-blue-500 text-white p-2 rounded">
-                유저 프로필 보기
-            </button>
+        <div>
+            <Avatar
+                sx={{ bgcolor: "#8ba7ff", cursor: "pointer" }}
+                onClick={handleProfileClick}
+            >
+                {user.username ? user.username.charAt(0).toUpperCase() : "U"}
+            </Avatar>
 
-            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="유저 프로필">
+            <Modal isOpen={isModalOpen} onClose={handleCloseModal} title="My Info">
                 <p><strong>Username:</strong> {user.username}</p>
                 <p><strong>Email:</strong> {user.email}</p>
-                <button onClick={logout} className="bg-red-500 text-white p-2 rounded">
-                    로그아웃
-                </button>
             </Modal>
         </div>
     );

@@ -83,11 +83,13 @@ const TaskBoard = () => {
     return (
         <div className="task-board-container">
             <div className="task-board">
-                <div className="absolute left-4 top-4">
-                    <LogoutButton onLogout={() => navigate("/login")}/>
-                </div>
-                <Profile />
+                <div className="header-container">
                 <h1 className="task-board-title">📌 Task Board</h1>
+                    <div className="logout-profile-container">
+                        <LogoutButton onLogout={() => navigate("/login")}/>
+                        <Profile/>
+                    </div>
+                </div>
 
                 {notification && (
                     <Notification

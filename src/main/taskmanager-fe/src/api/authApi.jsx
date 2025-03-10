@@ -1,20 +1,18 @@
 import {instance} from "../config/axiosConfig.jsx";
 import {getUserFromToken} from "../utils/authUtils.jsx";
+import axios from "axios";
 
 export const login = async (email, password) => {
     try {
         const response = await instance.post("/auth/login", { email, password });
 
-        console.log("로그인 응답 데이터:", response.data);
-
         const { accessToken, refreshToken } = response.data;
 
         if (accessToken && refreshToken) {
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
+            localStorage.setItem("accessToken", JSON.stringify(accessToken));
+            localStorage.setItem("refreshToken", JSON.stringify(refreshToken));
             instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
         } else {
-            console.error("응답에 토큰 없음");
             throw new Error("서버 응답에 토큰 정보가 없습니다.");
         }
         return response.data;
@@ -49,6 +47,31 @@ export const register = async (email, password, username) => {
     }
 };
 
+export const refreshAccessToken = async () => {
+    try {
+        const refreshToken = localStorage.getItem("refreshToken");
+        if (!refreshToken) {
+            logout();
+            return null;
+        }
+
+        const response = await axios.post("http://localhost:8080/api/auth/refresh", {}, { withCredentials: true });
+
+        if (response.data.accessToken) {
+            localStorage.setItem("accessToken", response.data.accessToken);
+            instance.defaults.headers.common["Authorization"] = `Bearer ${response.data.accessToken}`;
+            return response.data.accessToken;
+        } else {
+            console.warn("리프레시 토큰 만료 → 로그아웃");
+            logout();
+            return null;
+        }
+    } catch (error) {
+        console.error("토큰 갱신 실패:", error);
+        logout();
+        return null;
+    }
+};
 
 export const getCurrentUser = async () => {
     try {
@@ -56,10 +79,22 @@ export const getCurrentUser = async () => {
         return response.data;
     } catch (error) {
         if (error.response?.status === 401) {
-            console.warn("인증 만료 - 로그인 페이지로 이동");
-            localStorage.removeItem("token");
-            window.location.href = "/login";
+            const newAccessToken = await refreshAccessToken();
+
+            if (newAccessToken) {
+                return getCurrentUser();
+            } else {
+                console.warn("새 토큰 발급 실패 → 로그아웃");
+                logout();
+            }
         }
         throw error.response?.data || "사용자 정보 가져오기 실패";
     }
+};
+
+export const logout = () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    instance.defaults.headers.common["Authorization"] = "";
+    window.location.href = "/login";
 };

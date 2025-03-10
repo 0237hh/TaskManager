@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -87,22 +88,27 @@ public class AuthController {
         return ResponseEntity.ok(tokenResponse);
     }
 
-
     @GetMapping("/me")
-    public ResponseEntity<UserDto> getCurrentUser(@AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    public ResponseEntity<?> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: User not authenticated");
         }
 
-        User user = userRepository.findByUserEmail(userDetails.getUsername())
-                .orElseThrow(() -> {
-                    log.error("현재 사용자 조회 실패 - 존재하지 않는 사용자: {}", userDetails.getUsername());
-                    return new UsernameNotFoundException("User not found");
-                });
+        String userEmail = authentication.getName();
 
-        UserDto userDto = new UserDto(user.getUserEmail(), user.getUserName(), user.getUserPassword());
-        return ResponseEntity.ok(userDto);
+        User user = userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        Map<String, String> response = Map.of(
+                "userEmail", user.getUserEmail(),
+                "userName", user.getUserName()
+        );
+
+        return ResponseEntity.ok(response);
     }
+
 
     @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestParam("code") String code) {

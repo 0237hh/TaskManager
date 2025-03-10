@@ -1,21 +1,25 @@
-import {useContext, useEffect, useState} from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext.jsx";
-import {instance} from "../config/axiosConfig.jsx";
+import { instance } from "../config/axiosConfig.jsx";
 
 const useAuth = () => {
-    const { user, setUser } = useContext(AuthContext);
+    const { user, setUser, login, logout } = useContext(AuthContext);
 
     useEffect(() => {
-        const token = localStorage.getItem("token");
+        const accessToken = localStorage.getItem("accessToken");
 
-        if (token) {
+        if (accessToken) {
             try {
-                const parsedToken = JSON.parse(token);
-                instance.defaults.headers.common["Authorization"] = `Bearer ${parsedToken}`;
-            } catch (error) { }
-        } else { }
+                instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
+            } catch (error) {
+                console.error("토큰 설정 실패:", error);
+            }
+        } else {
+            console.warn("토큰이 존재하지 않습니다.");
+        }
     }, []);
-    return { user, setUser };
+
+    return { user, setUser, login, logout };
 };
 
 export default useAuth;

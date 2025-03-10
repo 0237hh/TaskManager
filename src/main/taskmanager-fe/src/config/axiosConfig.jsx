@@ -4,27 +4,26 @@ export const instance = axios.create({
     baseURL: "http://localhost:8080/api",
     headers: {
         "Content-Type": "application/json",
-    },
+    }
 });
-
-instance.defaults.withCredentials = true;
 
 instance.interceptors.request.use(
     async (config) => {
-        let token = localStorage.getItem("token");
+        let accessToken = localStorage.getItem("accessToken");
 
-        if (token) {
+        if (accessToken) {
             try {
-                token = JSON.parse(token);
+                accessToken = JSON.parse(accessToken);
             } catch (e) {}
 
-            if (typeof token === "string" && token.startsWith("ey")) {
-                config.headers.Authorization = `Bearer ${token}`;
+            if (typeof accessToken === "string" && accessToken.startsWith("ey")) {
+                config.headers.Authorization = `Bearer ${accessToken}`;
             } else {
-                localStorage.removeItem("token");
+                console.warn("잘못된 accessToken → 제거");
+                localStorage.removeItem("accessToken");
             }
         } else {
-            console.warn("토큰이 존재하지 않습니다.");
+            console.warn("accessToken이 존재하지 않습니다.");
         }
         return config;
     },
@@ -39,32 +38,38 @@ instance.interceptors.response.use(
         if (error.response && error.response.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
-            const refreshToken = getRefreshTokenFromCookie();
+            const refreshToken = localStorage.getItem("refreshToken");
 
             if (refreshToken) {
                 try {
                     const response = await axios.post(
                         "http://localhost:8080/api/auth/refresh",
-                        {},
-                        { headers: { Authorization: `Bearer ${refreshToken}` } }
+                        { refreshToken },
+                        { headers: { "Content-Type": "application/json" } }
                     );
+
                     const newAccessToken = response.data.accessToken;
-                    localStorage.setItem("token", JSON.stringify(newAccessToken));
-                    originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-                    return axios(originalRequest);
+                    if (newAccessToken) {
+                        localStorage.setItem("accessToken", JSON.stringify(newAccessToken));
+                        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+                        return axios(originalRequest);
+                    }
                 } catch (refreshError) {
-                    console.error("리프레시 토큰 갱신 실패", refreshError);
+                    localStorage.removeItem("accessToken");
+                    localStorage.removeItem("refreshToken");
+                    logout();
                 }
             } else {
                 console.warn("리프레시 토큰이 존재하지 않습니다.");
+                logout();
             }
         }
         return Promise.reject(error);
     }
 );
 
-function getRefreshTokenFromCookie() {
-    const cookies = document.cookie.split("; ");
-    const refreshTokenCookie = cookies.find(cookie => cookie.startsWith("refreshToken="));
-    return refreshTokenCookie ? refreshTokenCookie.split("=")[1] : null;
+function logout() {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    window.location.href = "/login";
 }

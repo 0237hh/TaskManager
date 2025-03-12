@@ -1,4 +1,3 @@
-# TaskManager
 # TaskManager :clipboard:
 
 **TaskManager**는 할 일 관리 웹 애플리케이션으로, 사용자가 할 일을 생성, 수정, 삭제하며 상태를 추적할 수 있는 기능을 제공합니다. 실시간 동기화 기능을 통해 여러 사용자가 동시에 작업을 할 수 있으며, **React**와 **Spring Boot**를 사용하여 개발되었습니다.

@@ -1,41 +1,45 @@
-import { createContext, useState, useEffect } from "react";
+import { createContext, useState, useEffect, useContext } from "react";
 import { getTasks, createTask, updateTask, deleteTask } from "../api/taskApi";
+import { AuthContext } from "./AuthContext.jsx";
 
 const TaskContext = createContext();
 
 const TaskProvider = ({ children }) => {
-    const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState([]);
+  const { user } = useContext(AuthContext);
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        fetchTasks();
-    }, []);
+  useEffect(() => {
+    if (!user) return;
+    fetchTasks();
+  }, [user]);
 
-    const fetchTasks = async () => {
-        const data = await getTasks();
-        setTasks(data);
-    };
+  const fetchTasks = async () => {
+    const data = await getTasks();
+    setTasks(data);
+  };
 
-    const addNewTask = async (task) => {
-        const newTask = await createTask(task);
-        setTasks([...tasks, newTask]);
-    };
+  const addNewTask = async (task) => {
+    const newTask = await createTask(task);
+    setTasks([...tasks, newTask]);
+  };
 
-    const updateExistingTask = async (taskId, updatedTask) => {
-        const updated = await updateTask(taskId, updatedTask);
-        setTasks(tasks.map(task => task.id === taskId ? updated : task));
-    };
+  const updateExistingTask = async (taskId, updatedTask) => {
+    const updated = await updateTask(taskId, updatedTask);
+    setTasks(tasks.map((task) => (task.id === taskId ? updated : task)));
+  };
 
-    const removeTask = async (taskId) => {
-        await deleteTask(taskId);
-        setTasks(tasks.filter(task => task.id !== taskId));
-    };
+  const removeTask = async (taskId) => {
+    await deleteTask(taskId);
+    setTasks(tasks.filter((task) => task.id !== taskId));
+  };
 
-    return (
-        <TaskContext.Provider value={{ tasks, addNewTask, updateExistingTask, removeTask }}>
-            {children}
-        </TaskContext.Provider>
-    );
+  return (
+    <TaskContext.Provider
+      value={{ tasks, addNewTask, updateExistingTask, removeTask }}
+    >
+      {children}
+    </TaskContext.Provider>
+  );
 };
 
-export {TaskContext, TaskProvider};
+export { TaskContext, TaskProvider };

@@ -5,12 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import java.util.Base64;
 
 @SpringBootApplication
+@EnableScheduling
 public class TaskManagerApplication {
 
     public static void main(String[] args){

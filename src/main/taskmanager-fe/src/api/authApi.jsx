@@ -109,3 +109,12 @@ export const logout = () => {
     window.location.href = "/login";
   }
 };
+
+export const updateUser = async (userName) => {
+  try {
+    const response = await instance.put("/auth/me", { userName });
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || "정보 수정 실패";
+  }
+};

@@ -7,8 +7,15 @@ const SOCKET_URL = "ws://localhost:8080/ws";
 let client = null;
 
 export const connectWebSocket = (onNotificationReceived, onTaskUpdate) => {
+    let accessToken = localStorage.getItem("accessToken");
+    try { accessToken = JSON.parse(accessToken); } catch (e) {}
+
+    const socketUrl = accessToken
+        ? `ws://localhost:8080/ws?token=${accessToken}`
+        : "ws://localhost:8080/ws";
+
     client = new Client({
-        brokerURL: SOCKET_URL,
+        brokerURL: socketUrl,
         reconnectDelay: 5000,
         debug: (str) => console.log(str),
         onConnect: () => {

@@ -5,16 +5,22 @@ import "../../styles/TaskForm.css";
 const TaskForm = ({ onAdd }) => {
     const [title, setTitle] = useState("");
     const [status, setStatus] = useState("IN_PROGRESS");
+    const [dueDate, setDueDate] = useState(""); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!title.trim()) return;
 
         try {
-            const newTask = await createTask({ title, status });
+            const newTask = await createTask({
+                title,
+                status,
+                dueDate: dueDate || null,  
+            });
             onAdd(newTask);
             setTitle("");
             setStatus("IN_PROGRESS");
+            setDueDate(""); 
         } catch (err) {
             console.error("할 일 추가 실패:", err);
         }
@@ -29,6 +35,12 @@ const TaskForm = ({ onAdd }) => {
                 placeholder="할 일을 입력하세요"
                 className="task-input"
                 required
+            />
+            <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+                className="task-input"
             />
             <select
                 value={status}

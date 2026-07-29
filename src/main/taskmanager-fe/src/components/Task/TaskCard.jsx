@@ -5,7 +5,13 @@ import EditIcon from "@mui/icons-material/Edit";
 import SaveIcon from "@mui/icons-material/Save";
 import { format } from "date-fns";
 
-export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setNewTitle, newStatus, setNewStatus, onUpdate, onDelete }) {
+export default function TaskCard({
+    task, isEditing, setIsEditing,
+    newTitle, setNewTitle,
+    newStatus, setNewStatus,
+    newDueDate, setNewDueDate,
+    onUpdate, onDelete
+}) {
     return (
         <Card sx={{ width: "100%", minWidth: 200, marginBottom: 2 }}>
             <CardHeader title={isEditing ? "수정 중" : task.title} subheader={task.status} />
@@ -18,6 +24,15 @@ export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setN
                             <MenuItem value="DONE">완료됨</MenuItem>
                             <MenuItem value="TODO">대기 중</MenuItem>
                         </Select>
+                        <TextField
+                            fullWidth
+                            type="date"
+                            label="마감기한"
+                            InputLabelProps={{ shrink: true }}
+                            value={newDueDate || ""}
+                            onChange={(e) => setNewDueDate(e.target.value)}
+                            sx={{ marginTop: 1 }}
+                        />
                     </>
                 ) : (
                     <>
@@ -27,9 +42,14 @@ export default function TaskCard({ task, isEditing, setIsEditing, newTitle, setN
                         <Typography variant="caption" color="text.secondary" display="block">
                             생성 날짜: {task.createdAt ? format(new Date(task.createdAt), "yyyy-MM-dd HH:mm") : "N/A"}
                         </Typography>
+                        {task.dueDate && (
+                            <Typography variant="caption" color="text.secondary" display="block">
+                                마감기한: {task.dueDate}
+                            </Typography>
+                        )}
                         {task.completedAt && (
                             <Typography variant="caption" color="text.secondary" display="block">
-                                완료 날짜: {task.completedAt ? format(new Date(task.completedAt), "yyyy-MM-dd HH:mm" ) : "N/A"}
+                                완료 날짜: {format(new Date(task.completedAt), "yyyy-MM-dd HH:mm")}
                             </Typography>
                         )}
                     </>

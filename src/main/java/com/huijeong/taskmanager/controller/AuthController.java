@@ -7,6 +7,7 @@ import com.huijeong.taskmanager.dto.UserSignupRequestDto;
 import com.huijeong.taskmanager.entity.User;
 import com.huijeong.taskmanager.repository.UserRepository;
 import com.huijeong.taskmanager.service.GoogleOAuthService;
+import com.huijeong.taskmanager.service.UserService;
 import com.huijeong.taskmanager.util.JwtTokenProvider;
 import com.huijeong.taskmanager.util.Role;
 import jakarta.servlet.http.Cookie;
@@ -28,7 +29,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-
+import com.huijeong.taskmanager.service.UserService;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -43,6 +44,7 @@ public class AuthController {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final GoogleOAuthService googleOAuthService;
+    private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody UserSignupRequestDto request) {
@@ -109,6 +111,30 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<?> updateCurrentUser(@RequestBody Map<String, String> request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized: User not authenticated");
+        }
+
+        String userEmail = authentication.getName();
+        String newUsername = request.get("userName");
+
+        if (newUsername == null || newUsername.isBlank()) {
+            return ResponseEntity.badRequest().body("사용자 이름은 비어있을 수 없습니다.");
+        }
+
+        User updatedUser = userService.updateUsername(userEmail, newUsername);
+
+        Map<String, String> response = Map.of(
+                "userEmail", updatedUser.getUserEmail(),
+                "userName", updatedUser.getUserName()
+        );
+
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/google-login")
     public ResponseEntity<?> googleLogin(@RequestParam("code") String code) {

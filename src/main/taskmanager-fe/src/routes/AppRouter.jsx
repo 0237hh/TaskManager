@@ -6,20 +6,31 @@ import TaskBoard from "../pages/TaskBoard";
 import Profile from "../pages/Profile";
 import PrivateRoute from "./PrivateRoute";
 import OAuth2CallbackHandler from "../components/Auth/OAuth2CallbackHandler.jsx";
+import CalendarView from "../pages/CalendarView.jsx";
 
 const AppRouter = () => {
-    return (
-        <Router>
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/profile" element={<PrivateRoute element={<Profile />} />} />
-                <Route path="/tasks" element={<PrivateRoute element={<TaskBoard />} />} />
-                <Route path="/oauth2/callback" element={<OAuth2CallbackHandler />} />
-            </Routes>
-        </Router>
-    );
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/profile"
+          element={<PrivateRoute element={<Profile />} />}
+        />
+        <Route
+          path="/tasks"
+          element={<PrivateRoute element={<TaskBoard />} />}
+        />
+        <Route path="/oauth2/callback" element={<OAuth2CallbackHandler />} />
+        {/* <Route
+          path="/calendar"
+          element={<PrivateRoute element={<CalendarView />} />}
+        /> */}
+      </Routes>
+    </Router>
+  );
 };
 
 export default AppRouter;

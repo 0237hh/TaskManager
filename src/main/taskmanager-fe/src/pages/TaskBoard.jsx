@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";  
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
-import "../styles/TaskBoard.css"
+import { IconButton, Tooltip } from "@mui/material";  
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"; 
+import "../styles/TaskBoard.css";
 import useTasks from "../hooks/useTasks";
 import TaskFilter from "../components/Task/TaskFilter";
 import TaskForm from "../components/Task/TaskForm";
@@ -9,121 +12,145 @@ import useWebSocket from "../hooks/useWebSocket.jsx";
 import Notification from "../components/common/Notification.jsx";
 import LogoutButton from "../components/Auth/LogoutButton.jsx";
 import Profile from "./Profile.jsx";
+import CalendarView from "./CalendarView.jsx"; 
 
 const TaskBoard = () => {
-    const { tasks, updateExistingTask, deleteTask } = useTasks();
-    const [taskList, setTaskList] = useState(tasks);
-    const [filter, setFilter] = useState("all");
-    const { messages, notification } = useWebSocket();
+  const navigate = useNavigate(); 
+  const { tasks, updateExistingTask, deleteTask } = useTasks();
+  const [taskList, setTaskList] = useState(tasks);
+  const [filter, setFilter] = useState("all");
+  const { messages, notification, setNotification } = useWebSocket();
+  const [calendarOpen, setCalendarOpen] = useState(false);
+  useEffect(() => {
+    if (taskList.length === 0) {
+      setTaskList(tasks);
+    }
+  }, [tasks]);
 
-    useEffect(() => {
-        if (taskList.length === 0) {
-            setTaskList(tasks);
-        }
-    }, [tasks]);
+  useEffect(() => {
+    if (messages.length > 0) {
+      const newMessage = messages[messages.length - 1];
 
-    useEffect(() => {
-        if (messages.length > 0) {
-            const newMessage = messages[messages.length - 1];
-
-            if (newMessage.action === "updateTask") {
-                setTaskList((prev) =>
-                    prev.map(task =>
-                        task.id === newMessage.taskId
-                            ? { ...task, status: newMessage.status }
-                            : task
-                    )
-                );
-            }
-        }
-    }, [messages]);
-
-    const handleAddTask = (newTask) => {
-        setTaskList((prev) => [...prev, newTask]);
-    };
-
-    const handleUpdateTask = (taskId, newTitle, newStatus) => {
-        const mappedStatus = newStatus === "COMPLETED" ? "DONE" : newStatus === "PENDING" ? "TODO" : newStatus;
-
+      if (newMessage.action === "updateTask") {
         setTaskList((prev) =>
-            prev.map(task => task.id === taskId ? { ...task, title: newTitle, status: mappedStatus } : task)
+          prev.map((task) =>
+            task.id === newMessage.taskId
+              ? { ...task, status: newMessage.status }
+              : task,
+          ),
         );
+      }
+    }
+  }, [messages]);
 
-        updateExistingTask(taskId, { title: newTitle, status: mappedStatus });
-    };
+  const handleAddTask = (newTask) => {
+    setTaskList((prev) => [...prev, newTask]);
+  };
 
-    const handleDeleteTask = (taskId) => {
-        setTaskList((prev) => prev.filter(task => task.id !== taskId));
-        deleteTask(taskId);
-    };
+  const handleUpdateTask = (taskId, newTitle, newStatus) => {
+    const mappedStatus =
+      newStatus === "COMPLETED"
+        ? "DONE"
+        : newStatus === "PENDING"
+          ? "TODO"
+          : newStatus;
 
-    const filteredTasks = taskList.filter(task =>
-        filter === "all"
-            ? true
-            : filter === "done"
-                ? task.status === "DONE"
-                : filter === "todo"
-                    ? task.status === "TODO"
-                    : filter === "in_progress"
-                        ? task.status === "IN_PROGRESS"
-                        : false
+    setTaskList((prev) =>
+      prev.map((task) =>
+        task.id === taskId
+          ? { ...task, title: newTitle, status: mappedStatus }
+          : task,
+      ),
     );
 
-    const handleDragEnd = (result) => {
-        if (!result.destination) return;
+    updateExistingTask(taskId, { title: newTitle, status: mappedStatus });
+  };
 
-        const newTaskList = [...taskList];
-        const [reorderedTask] = newTaskList.splice(result.source.index, 1);
-        newTaskList.splice(result.destination.index, 0, reorderedTask);
+  const handleDeleteTask = (taskId) => {
+    setTaskList((prev) => prev.filter((task) => task.id !== taskId));
+    deleteTask(taskId);
+  };
 
-        setTaskList(newTaskList);
-        updateExistingTask(reorderedTask.id, { ...reorderedTask, order: result.destination.index });
-    };
+  const filteredTasks = taskList.filter((task) =>
+    filter === "all"
+      ? true
+      : filter === "done"
+        ? task.status === "DONE"
+        : filter === "todo"
+          ? task.status === "TODO"
+          : filter === "in_progress"
+            ? task.status === "IN_PROGRESS"
+            : false,
+  );
 
-    return (
-        <div className="task-board-container">
-            <div className="task-board">
-                <div className="header-container">
-                <h1 className="task-board-title">📌 Task Board</h1>
-                    <div className="logout-profile-container">
-                        <LogoutButton onLogout={() => navigate("/login")}/>
-                        <Profile/>
-                    </div>
-                </div>
+  const handleDragEnd = (result) => {
+    if (!result.destination) return;
 
-                {notification && (
-                    <Notification
-                        message={notification.message}
-                        type={notification.type}
-                        onClose={() => setNotification(null)}
-                    />
-                )}
+    const newTaskList = [...taskList];
+    const [reorderedTask] = newTaskList.splice(result.source.index, 1);
+    newTaskList.splice(result.destination.index, 0, reorderedTask);
 
-                <div className="task-form-container">
-                    <TaskForm onAdd={handleAddTask}/>
-                </div>
+    setTaskList(newTaskList);
+    updateExistingTask(reorderedTask.id, {
+      ...reorderedTask,
+      order: result.destination.index,
+    });
+  };
 
-                <div className="task-filter-container">
-                    <TaskFilter filter={filter} onChange={setFilter}/>
-                </div>
-
-                <DragDropContext onDragEnd={handleDragEnd}>
-                    <Droppable droppableId="tasks">
-                        {(provided) => (
-                            <div ref={provided.innerRef} {...provided.droppableProps} className="task-list-container">
-                                <TaskList
-                                    tasks={filteredTasks}
-                                    onUpdate={handleUpdateTask}
-                                    onDelete={handleDeleteTask}
-                                />
-                                {provided.placeholder}
-                            </div>
-                        )}
-                    </Droppable>
-                </DragDropContext>
-            </div>
+  return (
+    <div className="task-board-container">
+      <div className="task-board">
+        <div className="header-container">
+          <h1 className="task-board-title">📌 Task Board</h1>
+          <div className="logout-profile-container">
+            <Tooltip title="캘린더 보기">
+              <IconButton onClick={() => setCalendarOpen(true)} sx={{ color: '#1976d2' }}>
+                <CalendarMonthIcon />
+              </IconButton>
+            </Tooltip>
+            <LogoutButton onLogout={() => navigate("/login")} />
+            <Profile />
+          </div>
         </div>
-    );
+
+        {notification && (
+          <Notification
+            message={notification.message}
+            type={notification.type}
+            onClose={() => setNotification(null)}
+          />
+        )}
+
+        <div className="task-form-container">
+          <TaskForm onAdd={handleAddTask} />
+        </div>
+
+        <div className="task-filter-container">
+          <TaskFilter filter={filter} onChange={setFilter} />
+        </div>
+
+        <DragDropContext onDragEnd={handleDragEnd}>
+          <Droppable droppableId="tasks">
+            {(provided) => (
+              <div
+                ref={provided.innerRef}
+                {...provided.droppableProps}
+                className="task-list-container"
+              >
+                <TaskList
+                  tasks={filteredTasks}
+                  onUpdate={handleUpdateTask}
+                  onDelete={handleDeleteTask}
+                />
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
+      <CalendarView open={calendarOpen} onClose={() => setCalendarOpen(false)} />
+    </div>
+  );
 };
 
 export default TaskBoard;

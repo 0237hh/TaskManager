@@ -41,7 +41,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
     }
 
     private String extractToken(ServletServerHttpRequest request) {
-        List<String> values = List.of(request.getServletRequest().getParameterMap().get("token"));
-        return (values != null && !values.isEmpty()) ? values.get(0) : null;
+        String[] values = request.getServletRequest().getParameterMap().get("token");
+        return (values != null && values.length > 0) ? values[0] : null;
     }
 }

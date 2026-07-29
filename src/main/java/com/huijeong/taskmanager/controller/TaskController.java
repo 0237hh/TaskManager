@@ -69,11 +69,22 @@ public class TaskController {
     // 태스크 수정
     @PutMapping("/{taskId}")
     public ResponseEntity<TaskResponseDto> updateTask(@PathVariable Long taskId,
-                                                      @RequestBody TaskRequestDto request,
-                                                      @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService.getUserByEmail(userDetails.getUsername());
-        return ResponseEntity.ok(taskService.updateTask(taskId, request, user));
+                                                  @RequestBody TaskRequestDto request,
+                                                  @AuthenticationPrincipal UserDetails userDetails) {
+    User user = userService.getUserByEmail(userDetails.getUsername());
+    TaskResponseDto updatedTask = taskService.updateTask(taskId, request, user);
+
+    Map<String, String> notification = new HashMap<>();
+    notification.put("message", "할 일이 수정되었습니다: " + updatedTask.getTitle());
+
+    try {
+        messagingTemplate.convertAndSend("/topic/notifications", notification);
+    } catch (Exception e) {
+        log.error("WebSocket 메시지 전송 실패: {}", e.getMessage());
     }
+
+    return ResponseEntity.ok(updatedTask);
+}
 
     // 태스크 순서 변경
     @PutMapping("/order")

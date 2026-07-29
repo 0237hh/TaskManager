@@ -22,6 +22,7 @@ export const createTask = async (taskData) => {
 export const updateTask = async (taskId, updatedData) => {
     try {
         await instance.put(`/tasks/${taskId}`, updatedData);
+        return response.data;
     } catch (error) {
         throw error.response?.data || "할 일 수정 실패";
     }
@@ -46,6 +47,7 @@ export const updateTaskOrder = async (taskIds) => {
 export const completeTask = async (taskId) => {
     try {
         await instance.put(`/tasks/${taskId}/done`, {});
+        return response.data;   
     } catch (error) {
         throw error.response?.data || "할 일 완료 처리 실패";
     }

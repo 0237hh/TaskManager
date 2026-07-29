@@ -8,26 +8,24 @@ export const instance = axios.create({
 });
 
 instance.interceptors.request.use(
-  async (config) => {
-    let accessToken = localStorage.getItem("accessToken");
+    async (config) => {
+        const publicPaths = ["/auth/login", "/auth/register"];
+        const isPublic = publicPaths.some(path => config.url?.includes(path));
 
-    if (accessToken) {
-      try {
-        accessToken = JSON.parse(accessToken);
-      } catch (e) {}
-
-      if (typeof accessToken === "string" && accessToken.startsWith("ey")) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-      } else {
-        console.warn("잘못된 accessToken → 제거");
-        localStorage.removeItem("accessToken");
-      }
-    } else {
-      console.warn("accessToken이 존재하지 않습니다.");
-    }
-    return config;
-  },
-  (error) => Promise.reject(error),
+        if (!isPublic) {
+            let accessToken = localStorage.getItem("accessToken");
+            if (accessToken) {
+                try { accessToken = JSON.parse(accessToken); } catch (e) {}
+                if (typeof accessToken === "string" && accessToken.startsWith("ey")) {
+                    config.headers.Authorization = `Bearer ${accessToken}`;
+                } else {
+                    localStorage.removeItem("accessToken");
+                }
+            }
+        }
+        return config;
+    },
+    (error) => Promise.reject(error)
 );
 
 instance.interceptors.response.use(

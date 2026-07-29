@@ -71,9 +71,9 @@ task installReact(type: Exec) {
     inputs.dir "$frontendDir"
     group = BasePlugin.BUILD_GROUP
     if (System.getProperty('os.name').toLowerCase(Locale.ROOT).contains('windows')) {
-        commandLine "cmd", "/c", "npm audit fix && npm install"
+        commandLine "cmd", "/c", "npm install"
     } else {
-        commandLine "npm", "audit", "fix" commandLine 'npm', 'install'
+        commandLine "npm", "install"
     }
 }
 
@@ -88,6 +88,7 @@ task buildReact(type: Exec) {
         commandLine "npm", "run-script", "build"
     }
 }
+
 
 task copyReactBuildFiles(type: Copy) {
     dependsOn "buildReact"

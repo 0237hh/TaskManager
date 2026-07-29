@@ -43,5 +43,8 @@ public class Task {
 
     private LocalDateTime completedAt;
 
+    @Column(nullable = false)
+    private boolean notified = false; 
+
     private int orderIndex;
 }

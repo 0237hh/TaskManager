@@ -42,10 +42,10 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**",
-                                "/oauth2/**", "/favicon.ico", "/assets/**", "/error","/ws/**", "/refresh").permitAll()
-                        .requestMatchers("/api/auth/register","/api/auth/login","/ws/**").permitAll()
+                                "/oauth2/**", "/favicon.ico", "/assets/**", "/error", "/ws/**", "/refresh",
+                                "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
                         .requestMatchers("/api/tasks/**", "/api/auth/me").authenticated()
-                        .requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -4,6 +4,8 @@ import com.huijeong.taskmanager.dto.TaskRequestDto;
 import com.huijeong.taskmanager.dto.TaskResponseDto;
 import com.huijeong.taskmanager.entity.Task;
 import com.huijeong.taskmanager.entity.User;
+import com.huijeong.taskmanager.exception.TaskNotFoundException;
+import com.huijeong.taskmanager.exception.UnauthorizedException;
 import com.huijeong.taskmanager.repository.TaskRepository;
 import com.huijeong.taskmanager.util.TaskStatus;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -64,10 +67,10 @@ public class TaskService {
     // 태스크 수정
     public TaskResponseDto updateTask(Long id, TaskRequestDto request, User user) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("해당 할 일을 찾을 수 없습니다. id=" + id));
 
         if (!task.getUser().equals(user)) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
 
         task.setTitle(request.getTitle());
@@ -95,10 +98,10 @@ public class TaskService {
         int priority = 1;
         for (Long taskId : taskIds) {
             Task task = taskRepository.findById(taskId)
-                    .orElseThrow(() -> new RuntimeException("Task not found"));
+                    .orElseThrow(() -> new TaskNotFoundException("해당 할 일을 찾을 수 없습니다. id=" + taskId));
 
             if (!task.getUser().equals(user)) {
-                throw new RuntimeException("Unauthorized");
+                throw new UnauthorizedException("Unauthorized");
             }
 
             task.setPriority(priority++);
@@ -110,10 +113,10 @@ public class TaskService {
     @Transactional
     public TaskResponseDto completeTask(Long taskId, User user) {
         Task task = taskRepository.findById(taskId)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("해당 할 일을 찾을 수 없습니다. id=" + taskId));
 
         if (!task.getUser().equals(user)) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
         task.setStatus(TaskStatus.DONE);
         if (task.getCompletedAt() == null) {
@@ -132,10 +135,10 @@ public class TaskService {
     // 태스크 삭제
     public void deleteTask(Long id, User user) {
         Task task = taskRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Task not found"));
+                .orElseThrow(() -> new TaskNotFoundException("해당 할 일을 찾을 수 없습니다. id=" + id));
 
         if (!task.getUser().equals(user)) {
-            throw new RuntimeException("Unauthorized");
+            throw new UnauthorizedException("Unauthorized");
         }
         taskRepository.delete(task);
         messagingTemplate.convertAndSend("/topic/tasks/delete", id);

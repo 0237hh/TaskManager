@@ -54,6 +54,7 @@ dependencies {
 
 tasks.named('test') {
     useJUnitPlatform()
+    systemProperty 'spring.profiles.active', System.getProperty('spring.profiles.active', 'test')
 }
 
 def frontendDir = "$projectDir/src/main/taskmanager-fe"

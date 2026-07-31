@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { connectWebSocket, disconnectWebSocket } from "../api/websocketApi";
+import { connectWebSocket, disconnectWebSocket } from "../api/WebSocketApi";
 
 const useWebSocket = () => {
   const [messages, setMessages] = useState([]);

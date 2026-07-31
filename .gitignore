@@ -35,6 +35,6 @@ out/
 
 ### VS Code ###
 .vscode/
-*.yml
-.env
+application.yml
 src/main/taskmanager-fe/.env
+.env

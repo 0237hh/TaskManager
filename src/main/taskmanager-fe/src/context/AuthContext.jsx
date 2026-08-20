@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, useRef } from "react";
-import { getCurrentUser, refreshAccessToken } from "../api/authApi";
+import { getCurrentUser } from "../api/authApi";
+import { refreshAccessToken } from "../config/axiosConfig.jsx";
 
 const AuthContext = createContext();
 
@@ -62,20 +63,16 @@ const AuthProvider = ({ children }) => {
     };
   }, []);
 
-  const login = async (accessToken, refreshToken) => {
+  const login = async (accessToken) => {
     localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
-
     try {
-      const userData = await getCurrentUser();
-
-      if (JSON.stringify(user) !== JSON.stringify(userData)) {
+        const userData = await getCurrentUser();
         setUser(userData);
-      }
+        connectWebSocket(() => {}, () => {});
     } catch (error) {
-      console.error("로그인 후 유저 정보 조회 실패:", error);
+        console.error("로그인 후 유저 정보 조회 실패:", error);
     }
-  };
+};
 
   const logout = () => {
     localStorage.removeItem("accessToken");

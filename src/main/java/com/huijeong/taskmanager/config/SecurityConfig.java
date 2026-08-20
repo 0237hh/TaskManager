@@ -44,7 +44,7 @@ public class SecurityConfig {
                         .requestMatchers("/", "/index.html", "/login", "/register", "/tasks/**",
                                 "/oauth2/**", "/favicon.ico", "/assets/**", "/error", "/ws/**", "/refresh",
                                 "/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-                        .requestMatchers("/api/auth/register", "/api/auth/login").permitAll()
+                        .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/logout").permitAll()
                         .requestMatchers("/api/tasks/**", "/api/auth/me").authenticated()
                         .anyRequest().authenticated()
                 )

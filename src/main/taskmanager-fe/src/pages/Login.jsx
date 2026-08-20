@@ -17,25 +17,20 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await login(credentials.email, credentials.password);
+        const response = await login(credentials.email, credentials.password);
+        const { accessToken } = response;   // refreshToken 안 씀
 
-      const { accessToken, refreshToken } = response;
-
-      if (accessToken && refreshToken) {
-        localStorage.setItem("accessToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-        await authLogin(accessToken, refreshToken);
-        alert("로그인 성공!");
-        navigate("/tasks");
-      } else {
-        alert("로그인 실패!");
-        throw new Error("Token이 반환되지 않았습니다.");
-      }
+        if (accessToken) {
+            await authLogin(accessToken);   // AuthContext의 login (accessToken만 넘기도록)
+            navigate("/tasks");
+        } else {
+            throw new Error("Token이 반환되지 않았습니다.");
+        }
     } catch (err) {
-      console.error("로그인 실패:", err);
-      setError("Invalid email or password");
+        console.error("로그인 실패:", err);
+        setError("Invalid email or password");
     }
-  };
+};
 
   return (
     <div

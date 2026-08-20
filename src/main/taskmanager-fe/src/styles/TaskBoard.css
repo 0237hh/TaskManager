@@ -55,19 +55,14 @@
     flex-wrap: wrap;
     gap: 20px;
     padding: 16px;
-    align-items: center;
+    align-items: flex-start; 
 }
 
 .task-item-container {
     width: 320px;
     max-width: 360px;
-    padding: 17px;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
+
 .header-container {
     display: flex;
     justify-content: space-between;

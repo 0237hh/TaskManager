@@ -1,24 +1,20 @@
-import { instance } from "../config/axiosConfig.jsx";
+import { instance, refreshAccessToken, logout } from "../config/axiosConfig.jsx";
 import { getUserFromToken } from "../utils/authUtils.jsx";
 import axios from "axios";
 
 export const login = async (email, password) => {
   try {
     const response = await instance.post("/auth/login", { email, password });
+    const { accessToken } = response.data;
 
-    const { accessToken, refreshToken } = response.data;
-
-    if (accessToken && refreshToken) {
+    if (accessToken) {
       localStorage.setItem("accessToken", JSON.stringify(accessToken));
-      localStorage.setItem("refreshToken", JSON.stringify(refreshToken));
-      instance.defaults.headers.common["Authorization"] =
-        `Bearer ${accessToken}`;
+      instance.defaults.headers.common["Authorization"] = `Bearer ${accessToken}`;
     } else {
       throw new Error("서버 응답에 토큰 정보가 없습니다.");
     }
     return response.data;
   } catch (error) {
-    console.error("로그인 실패:", error.response);
     throw error.response?.data || "로그인 실패";
   }
 };
@@ -51,37 +47,6 @@ export const register = async (email, password, username) => {
   }
 };
 
-export const refreshAccessToken = async () => {
-  try {
-    const refreshToken = localStorage.getItem("refreshToken");
-    if (!refreshToken) {
-      logout();
-      return null;
-    }
-
-    const response = await axios.post(
-      "http://localhost:8080/api/auth/refresh",
-      { refreshToken },
-      { withCredentials: true },
-    );
-
-    if (response.data.accessToken) {
-      localStorage.setItem("accessToken", response.data.accessToken);
-      instance.defaults.headers.common["Authorization"] =
-        `Bearer ${response.data.accessToken}`;
-      return response.data.accessToken;
-    } else {
-      console.warn("리프레시 토큰 만료 → 로그아웃");
-      logout();
-      return null;
-    }
-  } catch (error) {
-    console.error("토큰 갱신 실패:", error);
-    logout();
-    return null;
-  }
-};
-
 export const getCurrentUser = async () => {
   try {
     const response = await instance.get("/auth/me");
@@ -98,15 +63,6 @@ export const getCurrentUser = async () => {
       }
     }
     throw error.response?.data || "사용자 정보 가져오기 실패";
-  }
-};
-
-export const logout = () => {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
-  instance.defaults.headers.common["Authorization"] = "";
-  if (window.location.pathname !== "/login") {
-    window.location.href = "/login";
   }
 };
 

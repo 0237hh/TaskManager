@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";  
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { IconButton, Tooltip } from "@mui/material";  
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth"; 
 import "../styles/TaskBoard.css";
@@ -83,19 +82,27 @@ const TaskBoard = () => {
             : false,
   );
 
-  const handleDragEnd = (result) => {
-    if (!result.destination) return;
+const handleDragEnd = (event) => {
+  const { active, over } = event;
+  if (!over || active.id === over.id) return;
 
-    const newTaskList = [...taskList];
-    const [reorderedTask] = newTaskList.splice(result.source.index, 1);
-    newTaskList.splice(result.destination.index, 0, reorderedTask);
+  const sourceTask = filteredTasks.find((t) => t.id.toString() === active.id);
+  const destTask = filteredTasks.find((t) => t.id.toString() === over.id);
+  if (!sourceTask || !destTask) return;
 
-    setTaskList(newTaskList);
-    updateExistingTask(reorderedTask.id, {
+  const newTaskList = [...taskList];
+  const actualSourceIndex = newTaskList.findIndex((t) => t.id === sourceTask.id);
+  const actualDestIndex = newTaskList.findIndex((t) => t.id === destTask.id);
+
+  const [reorderedTask] = newTaskList.splice(actualSourceIndex, 1);
+  newTaskList.splice(actualDestIndex, 0, reorderedTask);
+
+  setTaskList(newTaskList);
+  updateExistingTask(reorderedTask.id, {
       ...reorderedTask,
-      order: result.destination.index,
-    });
-  };
+      order: actualDestIndex,
+  });
+};
 
   return (
     <div className="task-board-container">
@@ -129,24 +136,12 @@ const TaskBoard = () => {
           <TaskFilter filter={filter} onChange={setFilter} />
         </div>
 
-        <DragDropContext onDragEnd={handleDragEnd}>
-          <Droppable droppableId="tasks">
-            {(provided) => (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className="task-list-container"
-              >
-                <TaskList
-                  tasks={filteredTasks}
-                  onUpdate={handleUpdateTask}
-                  onDelete={handleDeleteTask}
-                />
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
+        <TaskList
+          tasks={filteredTasks}
+          onUpdate={handleUpdateTask}
+          onDelete={handleDeleteTask}
+          onDragEnd={handleDragEnd}
+        />
       </div>
       <CalendarView open={calendarOpen} onClose={() => setCalendarOpen(false)} />
     </div>

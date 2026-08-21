@@ -67,13 +67,9 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDto> login(@RequestBody UserLoginRequestDto request) {
         User user = userRepository.findByUserEmail(request.getEmail())
-                .orElseThrow(() -> {
-                    log.error("로그인 실패 - 존재하지 않는 이메일: {}", request.getEmail());
-                    return new UsernameNotFoundException("User not found");
-                });
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getUserPassword())) {
-            log.error("로그인 실패 - 비밀번호 불일치: 이메일={}", request.getEmail());
             throw new BadCredentialsException("Invalid password");
         }
 
@@ -85,9 +81,30 @@ public class AuthController {
         String accessToken = jwtTokenProvider.createAccessToken(request.getEmail());
         String refreshToken = jwtTokenProvider.createRefreshToken(request.getEmail());
 
-        TokenResponseDto tokenResponse = new TokenResponseDto(accessToken, refreshToken);
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+                .httpOnly(true)
+                .secure(false)         
+                .path("/")
+                .maxAge(7 * 24 * 60 * 60) 
+                .sameSite("Lax")
+                .build();
 
-        return ResponseEntity.ok(tokenResponse);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, refreshCookie.toString())
+                .body(new TokenResponseDto(accessToken, null));  // body엔 accessToken만
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout() {
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, deleteCookie.toString())
+                .build();
     }
 
     @GetMapping("/me")

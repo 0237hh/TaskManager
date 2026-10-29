@@ -15,7 +15,7 @@ import CalendarView from "./CalendarView.jsx";
 
 const TaskBoard = () => {
   const navigate = useNavigate(); 
-  const { tasks, updateExistingTask, deleteTask } = useTasks();
+  const { tasks, updateExistingTask, removeTask } = useTasks();
   const [taskList, setTaskList] = useState(tasks);
   const [filter, setFilter] = useState("all");
   const { messages, notification, setNotification } = useWebSocket();
@@ -67,7 +67,7 @@ const TaskBoard = () => {
 
   const handleDeleteTask = (taskId) => {
     setTaskList((prev) => prev.filter((task) => task.id !== taskId));
-    deleteTask(taskId);
+    removeTask(taskId);
   };
 
   const filteredTasks = taskList.filter((task) =>
@@ -97,10 +97,11 @@ const handleDragEnd = (event) => {
   const [reorderedTask] = newTaskList.splice(actualSourceIndex, 1);
   newTaskList.splice(actualDestIndex, 0, reorderedTask);
 
+  const prevList = taskList;
   setTaskList(newTaskList);
-  updateExistingTask(reorderedTask.id, {
-      ...reorderedTask,
-      order: actualDestIndex,
+  updateTaskOrder(newTaskList.map((t) => t.id)).catch((e) => {
+    console.error("순서 저장 실패:", e);
+    setTaskList(prevList);   // 실패하면 원래 순서로 되돌림
   });
 };
 

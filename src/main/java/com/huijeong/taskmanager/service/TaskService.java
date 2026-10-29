@@ -29,7 +29,7 @@ public class TaskService {
 
     // 전체 태스크 조회
     public List<TaskResponseDto> getTasks(User user) {
-        return taskRepository.findByUser(user)
+        return taskRepository.findByUserOrderByPriorityAscTaskIdAsc(user)
                 .stream()
                 .map(TaskResponseDto::fromEntity)
                 .toList();
@@ -54,7 +54,11 @@ public class TaskService {
         task.setStatus(request.getStatus());
         task.setUser(user);
         task.setDueDate(request.getDueDate());
-
+        int nextPriority = taskRepository.findTopByUserOrderByPriorityDesc(user)
+                .map(t -> t.getPriority() + 1)
+                .orElse(1);
+        task.setPriority(nextPriority);
+        
         task = taskRepository.save(task);
         TaskResponseDto response = TaskResponseDto.fromEntity(task);
 

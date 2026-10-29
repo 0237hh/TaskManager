@@ -20,6 +20,8 @@ export const createTask = async (taskData) => {
 };
 
 export const updateTask = async (taskId, updatedData) => {
+    const response = await instance.put(`/tasks/${taskId}`, updatedData); 
+
     try {
         await instance.put(`/tasks/${taskId}`, updatedData);
         return response.data;
@@ -45,6 +47,8 @@ export const updateTaskOrder = async (taskIds) => {
 };
 
 export const completeTask = async (taskId) => {
+    const response = await instance.put(`/tasks/${taskId}/done`, {});
+    
     try {
         await instance.put(`/tasks/${taskId}/done`, {});
         return response.data;   
